@@ -1,0 +1,24 @@
+[
+
+    {
+        "text": "设置",
+        "heading": "true"
+    },
+
+    {
+        "text": "账户信息",
+        "sref": "app.account",
+        "icon": "fa fa-credit-card"
+    },
+
+    {
+        "text": "联系我们",
+        "sref": "app.contact",
+        "icon": "fa fa-envelope"
+    },
+    {
+        "text": "退出",
+        "sref": "logout",
+        "icon": "em icon-logout"
+    }
+]

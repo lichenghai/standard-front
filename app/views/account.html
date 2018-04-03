@@ -1,0 +1,108 @@
+<h4>账户信息</h4>
+<!-- START row-->
+<div id="container" style="overflow-y: scroll;" class="row">
+   <div class="col-lg-12">
+      <!-- START panel-->
+      <div class="panel panel-default">
+         <div class="panel-body">
+            <form class="form-horizontal">
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">用户名</label>
+                  <div class="col-lg-10">
+                     <div class="form-control">{{account.username}}</div>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">密码</label>
+                  <div class="col-lg-10">
+                     <div class="form-control"><a href="" ng-dialog="password" ng-dialog-data="{{account}}" ng-click="isPassword=true" ng-dialog-close-by-document="false">点此修改密码</a>
+                     </div>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">简称</label>
+                  <div class="col-lg-10">
+                     <div class="form-control">{{account.cname}}</div>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">全称</label>
+                  <div class="col-lg-10">
+                     <div class="form-control">{{account.fullname}}</div>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">LOGO</label>
+                  <div class="col-lg-10">
+                     <img ng-src="{{account.logopath}}" class="thumb128" /><a href="" ng-dialog="upload" ng-click="isPassword=false">点击修改</a>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">联系人</label>
+                  <div class="col-lg-10">
+                     <input type="text" placeholder="联系人" ng-model="account.contactperson" class="form-control" />
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">联系电话</label>
+                  <div class="col-lg-10">
+                     <input type="text" placeholder="联系电话" ng-model="account.telephone" class="form-control" />
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">所在地区</label>
+                  <div class="col-lg-10">
+                     <div class="form-control">{{account.area}}</div>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">地址</label>
+                  <div class="col-lg-10">
+                     <input type="text" placeholder="地址" ng-model="account.address" class="form-control" />
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">二维码</label>
+                  <div class="col-lg-10">
+                     <img ng-src="{{account.qrcode}}" class="thumb128" /><a href="{{account.qrcode}}" download="download">点击下载</a>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">微网页</label>
+                  <div class="col-lg-10"><a href="{{account.weiurl}}" ng-click="alert(&quot;请复制后用微信客户端打开！&quot;);">{{account.weiurl}}</a>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">商户类型</label>
+                  <div class="col-lg-10">
+                     <div class="form-control">{{account.businessscope}}</div>
+                  </div>
+               </div>
+               <div class="form-group">
+                  <label class="col-lg-2 control-label">代理商</label>
+                  <div class="col-lg-10">
+                     <div class="form-control">{{account.sales}}</div>
+                  </div>
+               </div>
+               <!--.form-group-->
+               <!--  label.col-lg-2.control-label 接收广告-->
+               <!--  .col-lg-10-->
+               <!--    .form-control 是-->
+               <div class="form-group">
+                  <div class="col-lg-offset-2 col-lg-10">
+                     <button ng-click="saveAccount()" class="btn btn-sm btn-success">保存</button>
+                  </div>
+               </div>
+            </form>
+         </div>
+      </div>
+      <!-- END panel-->
+   </div>
+   <!-- END row-->
+</div>
+<script type="text/ng-template" id="upload">
+   <div ng-controller="ImageCropController" ng-class="isUploading"><h3 class="mt0">修改 LOGO</h3><div class="row"><div class="col-md-3"><div class="panel"><div class="panel-heading"><a href="#" ng-click="reset()" class="pull-right"><small class="fa fa-refresh text-muted"></small></a>选择图片</div><div class="panel-body"><div class="form-group"><input id="fileInput" filestyle="" type="file" data-class-button="btn btn-default" data-class-input="form-control" data-button-text="" nv-file-select="nv-file-select" uploader="uploader" class="form-control"/></div><br/><div data-text="Cropped Image" class="imgcrop-preview"><img ng-src="{{croppedImage}}"/></div></div></div><button ng-click="upload()" class="btn btn-primary">确定</button></div><div class="col-md-9"><div class="panel"><div class="panel-body"><div class="imgcrop-area"><img-crop image="image" result-image="croppedImage" area-type="{{imgcropType}}"></img-crop></div></div></div></div></div></div>
+</script>
+<script type="text/ng-template" id="password">
+   <div ng-controller="PasswordCtrl"><h3 class="mt0">修改密码</h3><div class="row"><form class="form-horizontal"><div class="form-group"><label class="col-lg-3 control-label">原密码</label><div class="col-lg-8"><input type="password" placeholder="原密码" ng-model="password.old" class="form-control"/></div></div><div class="form-group"><label class="col-lg-3 control-label">新密码</label><div class="col-lg-8"><input type="password" placeholder="新密码" ng-model="password.cur" class="form-control"/></div></div><div class="form-group"><label class="col-lg-3 control-label">确认密码</label><div class="col-lg-8"><input type="password" placeholder="确认密码" ng-model="password.dup" class="form-control"/></div></div></form></div><div class="row"><div class="col-lg-offset-1"><button type="button" ng-click="change()" class="btn btn-primary">确定</button></div></div></div>
+</script>

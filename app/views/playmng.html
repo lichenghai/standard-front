@@ -1,0 +1,95 @@
+<h4>播放管理</h4>
+<!-- START row-->
+<div id="container" style="overflow-y: scroll" class="row">
+   <div class="col-sm-12">
+      <ul class="nav nav-pills">
+         <li ng-repeat="box in boxes" ng-class="{active: $parent.currentBox == box.machineid}"><a ng-click="$parent.currentBox = box.machineid">{{box.machinename}}</a>
+         </li>
+      </ul>
+      <div class="panel panel-default">
+         <div class="panel-heading">广告素材</div>
+         <div class="panel-body">
+            <div class="row thumbnails no-padding">
+               <div ng-repeat="item in foregrounds" style="background-image: url(/upload/file/media_file/{{item.thumbnail}})" class="col-lg-2 col-md-2 col-sm-3 col-xs-5 thumb">
+                  <label class="checkbox-inline c-checkbox">
+                     <input type="checkbox" ng-checked="selectedMedia[item.mediaid]" ng-click="toggleMedia(item.mediaid)" ng-disabled="selectedMedia[item.mediaid] &amp;&amp; count(foregrounds) + count(videos) + count(backgrounds) == 1" />
+                     <span class="fa fa-check"></span>
+                  </label>
+                  <figcaption>
+                     <h3>{{item.medianame}}</h3>
+                     <span>{{item.note}}</span>
+                  </figcaption>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="panel panel-default">
+         <div class="panel-heading">背景素材</div>
+         <div class="panel-body">
+            <div class="row thumbnails no-padding">
+               <div ng-repeat="item in backgrounds" style="background-image: url(/upload/file/media_file/{{item.thumbnail}})" class="col-lg-2 col-md-2 col-sm-3 col-xs-5 thumb">
+                  <label class="checkbox-inline c-checkbox">
+                     <input type="checkbox" ng-checked="selectedMedia[item.mediaid]" ng-click="toggleMedia(item.mediaid)" ng-disabled="selectedMedia[item.mediaid] &amp;&amp; count(foregrounds) + count(videos) + count(backgrounds) == 1" />
+                     <span class="fa fa-check"></span>
+                  </label>
+                  <figcaption>
+                     <h3>{{item.medianame}}</h3>
+                     <span>{{item.note}}</span>
+                  </figcaption>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="panel panel-default">
+         <div class="panel-heading">视频素材</div>
+         <div class="panel-body">
+            <div style="height:80px" class="row thumbnails">
+               <div ng-repeat="item in videos" class="col-lg-2 col-md-2 col-sm-3 col-xs-5 video">
+                  <label class="checkbox-inline c-checkbox">
+                     <input type="checkbox" ng-checked="selectedMedia[item.mediaid]" ng-click="toggleMedia(item.mediaid)" ng-disabled="selectedMedia[item.mediaid] &amp;&amp; count(foregrounds) + count(videos) + count(backgrounds) == 1" />
+                     <span class="fa fa-check"></span>
+                  </label>
+                  <figcaption>
+                     <h3>{{item.medianame}}</h3>
+                     <span>{{item.note}}</span><a href="" ng-dialog="player" ng-dialog-data="{{item}}">预览</a>
+                  </figcaption>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="panel panel-default">
+         <div class="panel-heading">顶栏文本</div>
+         <div class="panel-body">
+            <div class="table-responsive">
+               <table class="table table-striped table-bordered table-hover">
+                  <thead>
+                     <tr>
+                        <th></th>
+                        <th>内容</th>
+                     </tr>
+                  </thead>
+                  <tbody>
+                     <tr ng-repeat="title in titles">
+                        <td>
+                           <div class="checkbox c-checkbox">
+                              <label>
+                                 <input type="checkbox" ng-checked="selectedTitles[title.titleid]" ng-click="toggleTitle(title.titleid)" />
+                                 <span class="fa fa-check"></span>
+                              </label>
+                           </div>
+                        </td>
+                        <td>
+                           <p>{{title.title}}</p>
+                        </td>
+                     </tr>
+                  </tbody>
+               </table>
+            </div>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- END row-->
+<script type="text/ng-template" id="player">
+   <div ng-controller="PlayerCtrl"><h3 class="mt0">视频预览</h3><videogular vg-theme="config.theme"><vg-media vg-src="config.sources"></vg-media><vg-controls><vg-play-pause-button></vg-play-pause-button><vg-time-display>{{ currentTime | date:'mm:ss' }}</vg-time-display><vg-scrub-bar><vg-scrub-bar-current-time></vg-scrub-bar-current-time></vg-scrub-bar><vg-time-display>{{ timeLeft | date:'mm:ss' }}</vg-time-display></vg-controls><vg-overlay-play></vg-overlay-play><vg-buffering></vg-buffering></videogular></div>
+</script>

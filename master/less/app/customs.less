@@ -1,0 +1,172 @@
+.portrait {
+  margin: 3px 0 5px 30px;
+}
+
+.media-box .block {
+  display: none;
+}
+
+.media-box:hover .block {
+  display: inline-block;
+}
+
+.social-batch {
+  margin: 21px 0;
+}
+
+.thumbnails {
+  margin-top: 25px;
+  .thumb {
+    background: no-repeat center;
+    background-size: contain;
+    height: 200px;
+    margin: 0 0 25px 25px;
+  }
+  .video {
+    height: 80px;
+    margin: 0 0 25px 25px;
+  }
+}
+
+/* Caption Style */
+.thumb {
+  overflow: hidden;
+  figcaption {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    padding: 10px;
+    background: #2c3f52;
+    color: #ed4e6e;
+    height: 80px;
+    width: 100%;
+    opacity: 0;
+    transform: translateY(100%);
+    backface-visibility: hidden;
+    a {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      text-align: center;
+      padding: 5px 10px;
+      border-radius: 2px;
+      display: inline-block;
+      background: #ed4e6e;
+      color: #fff;
+      text-decoration: none;
+    }
+    h3 {
+      margin: 0;
+      padding: 0;
+      color: #fff;
+    }
+  }
+  &:hover figcaption {
+    opacity: 1;
+    transform: translateY(0px);
+    transition: transform 0.4s, opacity 0.1s;
+  }
+}
+
+.video {
+  overflow: hidden;
+  figcaption {
+    left: 0;
+    bottom: 0;
+    padding: 10px;
+    background: #2c3f52;
+    color: #ed4e6e;
+    height: 80px;
+    width: 100%;
+    backface-visibility: hidden;
+    transition: transform 0.4s, opacity 0.1s 0.3s;
+    a {
+      position: absolute;
+      bottom: 10px;
+      right: 20px;
+      text-align: center;
+      padding: 5px 10px;
+      border-radius: 2px;
+      display: inline-block;
+      background: #ed4e6e;
+      color: #fff;
+      text-decoration: none;
+    }
+    .player {
+      right: 80px;
+    }
+    h3 {
+      margin: 0;
+      padding: 0;
+      color: #fff;
+    }
+  }
+}
+
+.add {
+  padding-top: 80px;
+  text-align: center;
+  font-size: 30px;
+  border: solid 1px #000;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.switch {
+  margin-bottom: 0;
+}
+
+.settings {
+  margin-top: 5px;
+}
+
+form.upload {
+  margin-bottom: 10px;
+  span {
+    margin-right: 5px;
+  }
+}
+
+.no-padding {
+  .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 {
+    padding: 0;
+  }
+  .c-checkbox span {
+    margin-right: 0;
+    width: 30px;
+    height: 30px;
+    background: #fff;
+    border-width: 3px;
+    border-radius: 5px;
+    &:before {
+      font-size: 24px;
+      line-height: 24px;
+    }
+  }
+}
+
+.whirl:after {
+  font-size: 24px;
+  color: black;
+}
+
+[draggable] {
+  -moz-user-select: none;
+  -khtml-user-select: none;
+  -webkit-user-select: none;
+  user-select: none;
+  /* Required to make elements draggable in old WebKit */
+  -khtml-user-drag: element;
+  -webkit-user-drag: element;
+}
+
+
+.drag {
+  cursor: move;
+}
+.drop.dropable {
+  border: 2px dashed #000;
+}
+.drop.dropable.hover {
+  background-color: lightgrey;
+}

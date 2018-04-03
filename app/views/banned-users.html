@@ -1,0 +1,75 @@
+<div class="pull-right">
+   <p class="m0">
+      <small class="mr">启用黑名单</small>
+      <label class="switch pull-right">
+         <input type="checkbox" checked="checked" ng-model="enabled" />
+         <span ng-click="toggleEnabled(!enabled)"></span>
+      </label>
+   </p>
+</div>
+<h4>黑名单</h4>
+<!-- START panel-->
+<div class="panel panel-default">
+   <div class="table-responsive">
+      <table class="table table-bordered table-hover">
+         <thead>
+            <tr>
+               <th>头像</th>
+               <th>昵称</th>
+               <th>来源</th>
+               <!--th 地区-->
+               <th>操作</th>
+               <th check-all="check-all">
+                  <div data-toggle="tooltip" data-title="全选" class="checkbox c-checkbox">
+                     <label>
+                        <input type="checkbox" />
+                        <span class="fa fa-check"></span>
+                     </label>
+                  </div>
+               </th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr ng-repeat="user in blacklist">
+               <td>
+                  <div class="media">
+                     <img ng-src="//wx.vshangping.com/weipage/file/{{user.headportrait || &quot;no-pic.png&quot;}}" class="img-responsive img-circle" />
+                  </div>
+               </td>
+               <td>{{user.nickname}}</td>
+               <td>{{user.source}}</td>
+               <!--td 北京-->
+               <td>
+                  <button ng-click="remove(user.blacklistid)" class="btn btn-danger">删除</button>
+               </td>
+               <td>
+                  <div class="checkbox c-checkbox">
+                     <label>
+                        <input type="checkbox" value="{{user.blacklistid}}" class="delete" />
+                        <span class="fa fa-check"></span>
+                     </label>
+                  </div>
+               </td>
+            </tr>
+         </tbody>
+      </table>
+   </div>
+   <!-- END table-responsive-->
+   <div class="panel-footer">
+      <div class="row">
+         <div class="col-lg-2">
+            <div class="input-group">
+               <input type="text" placeholder="查找" ng-model="findContent" class="input-sm form-control" />
+               <span class="input-group-btn">
+                  <button type="button" ng-click="find(findContent)" class="btn btn-sm btn-default">查找</button>
+               </span>
+            </div>
+         </div>
+         <div class="col-lg-8"></div>
+         <div class="col-lg-2">
+            <button ng-click="removeAll()" class="pull-right btn btn-sm btn-danger">批量删除</button>
+         </div>
+      </div>
+   </div>
+</div>
+<!-- END panel-->
