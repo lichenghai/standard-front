@@ -3,7 +3,9 @@
     "version": "0.0.0",
     "description": "Angle - Bootstrap Admin App + AngularJS",
     "author": "@themicon_co",
-    "dependencies": {},
+    "dependencies": {
+        "bower": "^1.8.4"
+    },
     "devDependencies": {
         "css-flip": "git://github.com/geedmo/css-flip",
         "qiniu": "~6.1.1",
