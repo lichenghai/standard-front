@@ -33,46 +33,6 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     resolve: helper.resolveFor('print-area'),
                     controller: 'SocialCtrl'
                 })
-                .state('app.filters', {
-                    url: '/filters',
-                    title: '审核方式',
-                    templateUrl: helper.basepath('filters.html'),
-                    controller: 'FiltersCtrl'
-                })
-                .state('app.ads', {
-                    url: '/ads',
-                    title: '素材管理',
-                    templateUrl: helper.basepath('adsmng.html'),
-                    resolve: helper.resolveFor('ngDialog','angularFileUpload',  'filestyle', 'com.2fdevs.videogular',
-                        'com.2fdevs.videogular.plugins.controls', 'com.2fdevs.videogular.plugins.overlayplay',
-                        'com.2fdevs.videogular.plugins.buffering', 'qiniu-js-sdk'),
-                    controller: 'AdsManage'
-                })
-                .state('app.activities', {
-                    url: '/activities',
-                    title: '活动管理',
-                    templateUrl: helper.basepath('activities.html'),
-                    resolve: helper.resolveFor('ngDialog', 'ueditor'),
-                    controller: 'ActivityCtrl'
-                })
-
-                .state('app.localplay', {
-                    url: '/localplay',
-                    title: '本地文件播放',
-                    templateUrl: helper.basepath('localplay.html'),
-                    resolve: helper.resolveFor('xeditable', 'angularBootstrapNavTree'),
-                    controller: 'LocalplayController'
-                })
-
-                .state('app.display', {
-                    url: '/display',
-                    title: '播放管理',
-                    templateUrl: helper.basepath('display.html'),
-                    resolve: helper.resolveFor('xeditable', 'angularBootstrapNavTree', 'ngDialog', 'filestyle', 'com.2fdevs.videogular',
-                        'com.2fdevs.videogular.plugins.controls', 'com.2fdevs.videogular.plugins.overlayplay',
-                        'com.2fdevs.videogular.plugins.buffering'),
-                    controller: 'DisplayController'
-                })
                 .state('app.account', {
                     url: '/account',
                     title: ' 账户信息',
@@ -85,24 +45,6 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     title: '评论统计',
                     templateUrl: helper.basepath('adstatistics.html')   ,
                     controller: 'AdstatisticsController'
-                })
-                .state('app.customerstatistics', {
-                    url: '/customerstatistics',
-                    title: '关注用户统计',
-                    templateUrl: helper.basepath('customerstatistics.html')   ,
-                    controller: 'MCustomerstatisticsController'
-                })
-                .state('app.addbox', {
-                    url: '/addbox',
-                    title: '添加盒子',
-                    templateUrl: helper.basepath('addbox.html'),
-                    controller: 'AddboxCtrl'
-                })
-                .state('app.contact', {
-                    url: '/contact',
-                    title: '联系我们',
-                    templateUrl: helper.basepath('contact.html'),
-                    controller: 'ContactCtrl'
                 })
                 .state('login', {
                     url: '/login',

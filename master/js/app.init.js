@@ -16,7 +16,7 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
         if (window.location.href.indexOf('standard') > 0) {
             $rootScope.url = 'www.standard.com';
         } else {
-            $rootScope.url = 'localhost';
+            $rootScope.url = 'localhost:8888';
         }
 
         // Uncomment this to disable template cache
