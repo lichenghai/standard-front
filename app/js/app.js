@@ -13,10 +13,11 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
         $rootScope.$stateParams = $stateParams;
         $rootScope.$storage = $window.localStorage;
 
-        if (window.location.href.indexOf('standard') > 0) {
+
+        if (window.location.href.indexOf('indexing') > 0) {
             $rootScope.url = 'www.standard.com';
         } else {
-            $rootScope.url = 'localhost:8888';
+            $rootScope.url = 'http://localhost:8888/indexing';
         }
 
         // Uncomment this to disable template cache
@@ -351,9 +352,9 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
  //       $state.go('app.account');
 
        $http
-            .post($rootScope.url+'/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
+            .post('/apis/remove-me/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
             .then(function (response) {
-                if (!response.data.status) {
+                if (response.data.status!=200) {
                     $scope.authMsg = response.data.message;
                 } else {
                     $state.go('app.account');
