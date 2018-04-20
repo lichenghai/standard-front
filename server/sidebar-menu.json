@@ -1,6 +1,17 @@
 [
 
     {
+        "text": "考评",
+        "heading": "true"
+    },
+
+    {
+        "text": "查看绩效",
+        "sref": "app.search",
+        "icon": "fa fa-book"
+    },
+
+    {
         "text": "设置",
         "heading": "true"
     },

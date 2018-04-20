@@ -26,12 +26,12 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     controller: 'AppController',
                     resolve: helper.resolveFor('fastclick', 'modernizr', 'icons', 'screenfull', 'animo', 'sparklines', 'slimscroll', 'classyloader', 'toaster', 'whirl', 'bootbox', 'moment')
                 })
-                .state('app.social-items', {
-                    url: '/social-items',
-                    title: '互动管理',
-                    templateUrl: helper.basepath('social-items.html'),
-                    resolve: helper.resolveFor('print-area'),
-                    controller: 'SocialCtrl'
+                .state('app.search', {
+                    url: '/search',
+                    title: '查看本人绩效',
+                    templateUrl: helper.basepath('search.html'),
+                    resolve: helper.resolveFor('ngDialog'),
+                    controller: 'SearchController'
                 })
                 .state('app.account', {
                     url: '/account',
