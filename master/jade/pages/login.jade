@@ -2,8 +2,9 @@
   // START panel
   .panel.panel-dark.panel-flat
     .panel-heading.text-center
-      a(href="#")
-        img.block-center.img-rounded(src='app/img/logo.png', alt='Image',style='height:auto;width:100%')
+      p 用户入口
+      //- a(href="#")
+      //-   img.block-center.img-rounded(src='app/img/logo.png', alt='Image',style='height:auto;width:100%')
     .panel-body
       p.text-center.pv 请您登录
       form(role='form', ng-submit="login()", validate-form='', novalidate='').mb-lg
@@ -24,5 +25,5 @@
     span(ng-bind="app.year")
     span  -
     span(ng-bind="app.name")
-    br
-    span(ng-bind="app.description")
+    //- br
+    //- span(ng-bind="app.description")

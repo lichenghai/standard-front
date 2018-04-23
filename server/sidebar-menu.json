@@ -6,11 +6,25 @@
     },
 
     {
-        "text": "查看绩效",
-        "sref": "app.search",
-        "icon": "fa fa-book"
+        "text": "考评页面",
+        "sref": "app.evaluate",
+        "icon": "fa fa-pencil-square-o"
     },
-
+    {
+        "text": "绩效搜索",
+        "sref": "app.search",
+        "icon": "fa fa-search"
+    },
+    {
+        "text": "信息维护",
+        "sref": "app.setting",
+        "icon": "fa fa-cog"
+    },
+    {
+        "text": "成长曲线",
+        "sref": "app.graph",
+        "icon": "fa fa-line-chart"
+    },
     {
         "text": "设置",
         "heading": "true"

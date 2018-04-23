@@ -1,0 +1,58 @@
+h3 考评页面
+
+#container.row(style='overflow-y: scroll')
+    .col-lg-9
+        // START panel
+        .panel.panel-default
+            .form-group
+                // START table-responsive
+                h4(style="text-align:center") 政治工作
+                hr
+                .table-responsive
+                    table.table.table-condensed.table-bordered.table-hover
+                        thead
+                            tr
+                                th.col-lg-1 序号
+                                th.col-lg-2 加分内容
+                                th.col-lg-4 数量
+                                th.col-lg-3 加分情况说明
+                                th.col-lg-2 减分内容
+                                th.col-lg-4 数量
+                                th.col-lg-3 减分情况说明
+                                th.col-lg-2 得分
+                                th 操作
+                        tbody(ng-repeat='item in items')
+                            tr
+                                td {{$index+1}}
+                                td {{item.increase_name}}
+                                td 
+                                    button.btn(ng-click="plus('inc', $index , -1)") 
+                                        i.fa.fa-minus
+                                    input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="inc_count[$index]")
+                                    button.btn(ng-click="plus('inc', $index , 1)")
+                                        i.fa.fa-plus
+                                td {{item.increase_detail}}
+                                td {{item.decrease_name}}
+                                td 
+                                    button.btn(ng-click="plus('dec', $index , -1)") 
+                                        i.fa.fa-minus
+                                    input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="dec_count[$index]")
+                                    button.btn(ng-click="plus('dec', $index , 1)")
+                                        i.fa.fa-plus
+                                td {{item.decrease_detail}}
+                                td {{item.total_point}}
+                                td
+                                    button.btn.btn-link(type='button', ng-click='alert("id:"+item.id)')
+                                        span 清空
+                        tfoot
+                            tr(ng-if='results.length===0')
+                                td(colspan='11') 暂无数据
+                // END table-responsive
+                hr
+
+                p
+                    span
+                        button.btn.btn-block.btn-success(type='button', ng-click='submit()') 提交
+                    span
+                        button.btn.btn-block.btn-default(type='button', ng-click='resetList()') 重置
+    
