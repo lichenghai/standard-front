@@ -110,7 +110,7 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     url: '/graph',
                     title: '查看本人成长曲线',
                     templateUrl: helper.basepath('graph.html'),
-                    resolve: helper.resolveFor('ngDialog'),
+                    resolve: helper.resolveFor('ngDialog', 'chartjs'),
                     controller: 'GraphController'
                 })
                 .state('app.account', {
@@ -196,17 +196,8 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
     }]).config(["$httpProvider", function ($httpProvider) {
         $httpProvider.interceptors.push('httpInterceptor');
     }])
-;
 
-/*
-module.exports = {
-    'ACCESS_KEY': 'YLbYmVZKcEgV3OL86oRQhnQms-rPhRPN75rKhu8Z',
-    'SECRET_KEY': '0xiVQnorAAtluChEIJTSzluEnRfCBqBmXWoSto4F',
-    'Bucket_Name': 'media',
-    'Port': 19110,
-    //'Uptoken_Url': '',
-    'Domain': 'http://7xlx4k.com2.z0.glb.qiniucdn.com/'
-};*/
+
 
 /**=========================================================
  * Module: constants.js
@@ -386,6 +377,7 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
        //          if (response.data.status!=200) {
        //              $scope.authMsg = response.data.message;
        //          } else {
+        //          $rootScope.account=response.data.data;
        //              $state.go('app.account');
        //          };
        //      }, function (x) {
@@ -407,7 +399,7 @@ App.controller('AccountController', ['$scope', '$rootScope', '$http', function (
     });
 
     $http
-        .get('/nongyequan-server/account.action')
+        .get('/nongyequan-server/person/get?id=')
         .then(function (response) {
             if (response.data.status) {
                 $rootScope.account = response.data.data;
@@ -550,183 +542,202 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
     $scope.format = 'yyyy年M月d日';
 }]);
 
-    /**=========================================================
-     * Module: EvaluateController.js
-     =========================================================*/
+/**=========================================================
+ * Module: EvaluateController.js
+ =========================================================*/
 
-     App.controller('EvaluateController', ['$scope', '$http', '$rootScope',
-        function ($scope, $http, $rootScope) {
+ App.controller('EvaluateController', ['$scope', '$http', '$rootScope',
+    function ($scope, $http, $rootScope) {
 
-            $scope.inc_count = [];
-            $scope.dec_count = [];
-            $scope.plus = function(name, index, step){
-                if (name === "inc"){
-                   var val = $scope.inc_count[index];
-                }
-               else if (name === "dec"){
-                   var val = $scope.dec_count[index];
-               }
-
-               if (isNaN(val)){
-                val = 0;
+        $scope.data = [
+        {
+            id : "0",
+            level : "0",
+            index_name : "政治工作",
+            items :
+            [
+            {
+                id : "1",
+                department_id : "1",
+                index_name: "学习",
+                increase_name : "好好学习",
+                increase_point : 2,
+                increase_unit: "次",
+                decrease_name : "没出操",
+                decrease_point : 1,
+                decrease_unit: "次",
+                level : "1",
+                father_id : "0",
+            },
+            {
+                id : "2",
+                department_id : "1",
+                index_name: "党务",
+                increase_name : "好好学习",
+                increase_point : 2,
+                increase_unit: "次",
+                decrease_name : "没出操",
+                decrease_point : 1,
+                decrease_unit: "次",
+                level : "1",
+                father_id : "0",
             }
-            val = Math.abs(val);
-            val = Math.floor(val);
-            val += step;    
-            if (val < 0){
-                val = 0;
-            }
-            if (name === "inc"){
-               $scope.inc_count[index] = val;
-            }
-            else if (name === "dec"){
-               $scope.dec_count[index] = val;
-            }
-       };
+            ]
 
-       $rootScope.IncreaseTypeList = [{
-        key: 0,
-        value:"全部"
-    },
-    {
-        key:1,
-        value: "仅显示扣分"
-    },
-    {
-        key:2,
-        value: "仅显示得分"
-    }
-    ];
+        },
+        {
+            id : "3",
+            level : "0",
+            index_name : "训练工作",
+            items :
+            [
+            {
+                id : "4",
+                department_id : "1",
+                index_name: "党务",
+                increase_name : "好好学习",
+                increase_point : 2,
+                increase_unit: "次",
+                decrease_name : "没出操",
+                decrease_point : 1,
+                decrease_unit: "次",
+                level : "1",
+                father_id : "3",
+            },
+            {
+             id : "5",
+             department_id : "1",
+             index_name: "党务",
+             increase_name : "好好学习",
+             increase_point : 2,
+             increase_unit: "次",
+             decrease_name : "没出操",
+             decrease_point : 1,
+             decrease_unit: "次",
+             level : "1",
+             father_id : "3",
+         }
+         ]
+     }
+     ];
 
-    $rootScope.CommentTypeList = [{
-        key: 0,
-        value:"全部"
-    },
-    {
-        key:1,
-        value: "仅显示含评语结果"
-    },
-    {
-        key:2,
-        value: "仅显示无评语结果"
-    }
-    ];
-
-    $scope.items = [{
-        id : "1",
-        increase_name : "好好学习",
-        increase_num : 1,
-        increase_detail : "读了一本书",
-        decrease_name : "没出操",
-        decrease_num : 2,
-        decrease_detail : "不听话",
-
-        total_point: "100",
-    },
-    {
-        id : "2",
-        increase_name : "努力干活",
-        increase_num : 1,
-        increase_detail : "干到死",
-        decrease_name : "没理想",
-        decrease_num : 2,
-        decrease_detail : "没追求",
-
-        total_point: "50",
-    }
-    ];
-    $scope.search = {
-        increaseType: 0,
-        commentType: 0,
-        timeStart: '',
-        timeEnd: '',
-        page: 1,
-        size: 2
+     $scope.operate = function(item, index, step){
+        if (index === 0){
+            var val = item.increase_num;
+            item.increase_num = doPlus(val, step);
+        }
+        else if (index === 1){
+            var val = item.decrease_num;
+            item.decrease_num = doPlus(val, step);
+        }
+        if (isNaN(item.increase_num)){
+            item.increase_num = 0;
+        }
+        if (isNaN(item.decrease_num)){
+            item.decrease_num = 0;
+        }
+        item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
     };
-    $scope.timeStart = '';
-    $scope.timeEnd = '';
-    $scope.opened = {
-        start: false,
-        end: false
+
+    var doPlus = function(val, step){
+        if (isNaN(val)){
+            val = 0;
+        }
+        val = Math.abs(val);
+        val = Math.floor(val);
+        val += step;
+        if (val < 0){
+            val = 0;
+        }
+        return val;
     };
 
     var
-    buildParam = function () {
+    buildParam = function (url) {
         var param = {
             method: 'GET',
-            url: '/apis/remove-me/standard-service/result/search',
+            url: url,
             params: $scope.search
         };
         return param;
     },
-    loadData = function () {
-        $http(buildParam())
-        .then(function (response) {
-            if (response.data.status === 200) {
-                $scope.items = response.data.data.list;
-                $scope.totalItems = response.data.data.total;
-            } else {
-                $.notify(response.data.message, 'danger');
-            }
-        }, function (x) {
-            $.notify('服务器出了点问题，我们正在处理', 'danger');
-        });
-    },
-    resetList = function () {
-        $scope.search.page = 1;
+    loadData = function (url) {
+            // $http(buildParam(url))
+            //     .then(function (response) {
+            //         if (response.data.status === 200) {
+            //             $scope.data = response.data.data.list;
+            //         } else {
+            //             $.notify(response.data.message, 'danger');
+            //         }
+            //     }, function (x) {
+            //         $.notify('服务器出了点问题，我们正在处理', 'danger');
+            //     });
+        };
 
+        $scope.person = {
+            person_id : "0",
+            username : "李成海",
+            department_id : "0",
+            department_name : "训练处"
+        };
 
-        if (!!$scope.timeStart) {
-            var date = new Date($scope.timeStart);
-            $scope.search.timeStart=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
-
-                      //  $scope.search.timeStart = $scope.timeStart + ' 00:00:00';
-                  }
-
-                  if (!!$scope.timeEnd) {
-                    var date = new Date($scope.timeEnd);
-                    $scope.search.timeEnd=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59' ;
-
-                       // $scope.search.timeEnd = $scope.timeEnd + ' 23:59:59';
-                   }
-
-                   loadData();
-               };
-
-               $scope.pageChanged = loadData;
-               $scope.searchList = resetList;
-               $scope.dateOptions = {
-                datepickerMode: 'year',
-                formatYear: 'yyyy',
-                startingDay: 1,
-                formatDayTitle: 'yyyy年M月'
-            };
-
-            $scope.open = function ($event, attr) {
-                $event.preventDefault();
-                $event.stopPropagation();
-
-                $scope.opened[attr] = true;
-            };
-
-            $scope.resetSearch = function () {
-                $scope.totalItems = 0;
-                $scope.search.commentType = 0;
-                $scope.search.timeStart = '';
-                $scope.search.timeEnd = '';
-                $scope.timeStart = '';
-                $scope.timeEnd = '';
-                resetList();
-            };
-
-            $(window).resize(function () {
-                var d = $('#container');
-                d.height($(window).height() - d.offset().top);
+        $scope.submit = function(){
+            var dataPost = {};
+            dataPost.person = $scope.person;
+            dataPost.result = [];
+            $scope.data.forEach(function(data_i, index){
+                data_i.items.forEach(function(item, index){
+                    if (item.level==="0" || !isNaN(item.total_point)) {
+                        dataPost.result.push(item);
+                    }
+                });
             });
-            $(window).resize();
+            alert(dataPost.result[0].total_point);
+        };
 
-            resetList();
-        }]);
+        $scope.reset = function(item){
+            item.increase_num = "";
+            item.increase_detail = "";
+            item.decrease_num = "";
+            item.decrease_detail = "";
+            item.total_point = "";
+        };
+        $scope.resetAll = function(){
+            $scope.data.forEach(function(data_i, index){
+                data_i.items.forEach(function(item){
+                    $scope.reset(item);
+                });
+            });
+        };
+
+        //把日期格式2018/04/20替换为2018-04-20
+        $scope.timeStart = (new Date()).toLocaleDateString().replace(/\//g,'-');
+        $scope.timeEnd = '';
+        $scope.opened = {
+            start: false,
+            end: false
+        };
+        $scope.dateOptions = {
+            datepickerMode: 'year',
+            formatYear: 'yyyy',
+            startingDay: 1,
+            formatDayTitle: 'yyyy年M月',
+        };
+
+        $scope.open = function ($event, attr) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            $scope.opened[attr] = true;
+        };
+
+        $(window).resize(function () {
+            var d = $('#container');
+            d.height($(window).height() - d.offset().top);
+        });
+        $(window).resize();
+
+    }]);
 
 /**=========================================================
  * Module: GraphController.js

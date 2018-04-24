@@ -15,11 +15,7 @@
         "sref": "app.search",
         "icon": "fa fa-search"
     },
-    {
-        "text": "信息维护",
-        "sref": "app.setting",
-        "icon": "fa fa-cog"
-    },
+
     {
         "text": "成长曲线",
         "sref": "app.graph",
@@ -31,9 +27,9 @@
     },
 
     {
-        "text": "账户信息",
-        "sref": "app.account",
-        "icon": "fa fa-credit-card"
+        "text": "信息维护",
+        "sref": "app.setting",
+        "icon": "fa fa-cog"
     },
 
     {

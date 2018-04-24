@@ -58,7 +58,7 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     url: '/graph',
                     title: '查看本人成长曲线',
                     templateUrl: helper.basepath('graph.html'),
-                    resolve: helper.resolveFor('ngDialog'),
+                    resolve: helper.resolveFor('ngDialog', 'chartjs'),
                     controller: 'GraphController'
                 })
                 .state('app.account', {
@@ -144,14 +144,5 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
     }).config(function ($httpProvider) {
         $httpProvider.interceptors.push('httpInterceptor');
     })
-;
 
-/*
-module.exports = {
-    'ACCESS_KEY': 'YLbYmVZKcEgV3OL86oRQhnQms-rPhRPN75rKhu8Z',
-    'SECRET_KEY': '0xiVQnorAAtluChEIJTSzluEnRfCBqBmXWoSto4F',
-    'Bucket_Name': 'media',
-    'Port': 19110,
-    //'Uptoken_Url': '',
-    'Domain': 'http://7xlx4k.com2.z0.glb.qiniucdn.com/'
-};*/
+

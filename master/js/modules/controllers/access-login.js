@@ -18,6 +18,7 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
        //          if (response.data.status!=200) {
        //              $scope.authMsg = response.data.message;
        //          } else {
+        //          $rootScope.account=response.data.data;
        //              $state.go('app.account');
        //          };
        //      }, function (x) {

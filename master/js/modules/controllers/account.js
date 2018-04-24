@@ -10,7 +10,7 @@ App.controller('AccountController', ['$scope', '$rootScope', '$http', function (
     });
 
     $http
-        .get('/nongyequan-server/account.action')
+        .get('/nongyequan-server/person/get?id=')
         .then(function (response) {
             if (response.data.status) {
                 $rootScope.account = response.data.data;
