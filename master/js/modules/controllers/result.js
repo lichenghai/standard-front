@@ -109,4 +109,7 @@
         });
         $(window).resize();
 
+        $scope.back = function(){
+            $state.go('app.evaluate');
+        };
     }]);

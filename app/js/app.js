@@ -1226,6 +1226,9 @@ App.controller('QiniuFileUploadController', ['$scope', '$rootScope', '$timeout',
         });
         $(window).resize();
 
+        $scope.back = function(){
+            $state.go('app.evaluate');
+        };
     }]);
 
 /**=========================================================
