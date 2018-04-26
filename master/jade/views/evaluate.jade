@@ -10,12 +10,19 @@ style.
         text-align:center;
     }
 
+
+p 
+    span.col-sm-2 姓名：{{person.username}}
+    span 部门：{{person.department_name}}
+
+hr
+
 .form-group
     p
-        span.h4 日期：
+        span 日期：
         span
             .input-group.col-sm-2
-                input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions',defaultViewDate='today', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true')
+                input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true')
                 span.input-group-btn
                     button.btn.btn-default(type='button', ng-click='open($event, "start")')
                         em.fa.fa-calendar
@@ -25,7 +32,6 @@ hr
                 .form-group(ng-repeat='data_i in data')
                     // START table-responsive
                     h4(style="text-align:center") {{data_i.index_name}}
-                    hr
                     .table-responsive
                         table.table.table-bordered.table-condensed.table-hover
                             thead
@@ -66,11 +72,12 @@ hr
                                     td
                                         button.btn.btn-link(type='button', ng-click='reset(item)')
                                             span 清空
-                            tfoot
-                                tr(ng-if='results.length===0')
-                                    td(colspan='11') 暂无数据
+                            //- tfoot
+                            //-     tr(ng-if='results.length===0')
+                            //-         td(colspan='11') 暂无数据
                     // END table-responsive
-                    hr
+                p 今日得分：{{totalPoints}}
+                hr
 
                 p
                     span

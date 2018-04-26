@@ -40,13 +40,13 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     resolve: helper.resolveFor('ngDialog'),
                     controller: 'EvaluateController'
                 })
-                // .state('app.result', {
-                //     url: '/result',
-                //     title: '查看本人绩效',
-                //     templateUrl: helper.basepath('result.html'),
-                //     resolve: helper.resolveFor('ngDialog'),
-                //     controller: 'SearchController'
-                // })
+                .state('app.result', {
+                    url: '/result',
+                    title: '查看本人绩效',
+                    templateUrl: helper.basepath('result.html'),
+                    resolve: helper.resolveFor('ngDialog'),
+                    controller: 'ResultController'
+                })
                 .state('app.setting', {
                     url: '/setting',
                     title: '个人信息维护',

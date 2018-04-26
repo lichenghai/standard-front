@@ -92,13 +92,13 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     resolve: helper.resolveFor('ngDialog'),
                     controller: 'EvaluateController'
                 })
-                // .state('app.result', {
-                //     url: '/result',
-                //     title: '查看本人绩效',
-                //     templateUrl: helper.basepath('result.html'),
-                //     resolve: helper.resolveFor('ngDialog'),
-                //     controller: 'SearchController'
-                // })
+                .state('app.result', {
+                    url: '/result',
+                    title: '查看本人绩效',
+                    templateUrl: helper.basepath('result.html'),
+                    resolve: helper.resolveFor('ngDialog'),
+                    controller: 'ResultController'
+                })
                 .state('app.setting', {
                     url: '/setting',
                     title: '个人信息维护',
@@ -367,7 +367,7 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
     $scope.authMsg = '';
 
     $scope.login = function () {
-        $scope.authMsg = 'oh no';
+        $scope.authMsg = '欢迎登陆';
         $state.go('app.account');
         
 
@@ -546,8 +546,8 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
  * Module: EvaluateController.js
  =========================================================*/
 
- App.controller('EvaluateController', ['$scope', '$http', '$rootScope',
-    function ($scope, $http, $rootScope) {
+ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state', 
+    function ($scope, $http, $rootScope, $state) {
 
         //***需要替换为从后台获取的数据***
         $scope.data = [
@@ -606,21 +606,21 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
                 father_id : "3",
             },
             {
-               id : "5",
-               department_id : "1",
-               index_name: "党务",
-               increase_name : "好好学习",
-               increase_point : 2,
-               increase_unit: "次",
-               decrease_name : "没出操",
-               decrease_point : 1,
-               decrease_unit: "次",
-               level : "1",
-               father_id : "3",
-           }
-           ]
-       }
-       ];
+             id : "5",
+             department_id : "1",
+             index_name: "党务",
+             increase_name : "好好学习",
+             increase_point : 2,
+             increase_unit: "次",
+             decrease_name : "没出操",
+             decrease_point : 1,
+             decrease_unit: "次",
+             level : "1",
+             father_id : "3",
+         }
+         ]
+     }
+     ];
 
     //***需要替换为从后台获取的数据***
     $rootScope.person = {
@@ -629,6 +629,8 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
         department_id : 0,
         department_name : "训练处"
     };
+
+    $scope.totalPoints = 0;
 
     $scope.operate = function(item, index, step){
         if (index === 0){
@@ -645,7 +647,11 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
         if (isNaN(item.decrease_num) || item.decrease_num===""){
             item.decrease_num = 0;
         }
+        if (!isNaN(item.total_point)){
+            $scope.totalPoints -= item.total_point; 
+        }
         item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
+        $scope.totalPoints += item.total_point;
     };
 
     var doPlus = function(val, step){
@@ -690,11 +696,16 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
             var dataPost = {};
 
             //所有条目都相同的部分
+            //读$rootScope
             dataPost.person_id = $rootScope.person.person_id;
             dataPost.department_id = $rootScope.person.department_id;
             dataPost.department_name = $rootScope.person.department_name;
+            //下面都是读$scope
             dataPost.standard_date = $scope.datePicked;
-            dataPost.submit_time = new Date().toLocaleTimeString();
+            dataPost.submit_time = (new Date()).toLocaleTimeString();
+
+            var postFlag = false;
+
             //每个条目不同的部分
             //对于每个大项
             $scope.data.forEach(function(data_i, index){
@@ -720,6 +731,7 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
                             //     $.notify('服务器出了点问题，我们正在处理', 'danger');
                             // });
                             hasValue = true;
+                            postFlag = true;
                         }
 
                         //提交该小条目
@@ -753,8 +765,13 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
                         }
 
                     });
-
             });
+            if (postFlag){
+                $state.go('app.result');
+            }
+            else{
+                $.notify('填写内容为空', 'danger');
+            }
         };
 
         $scope.reset = function(item){
@@ -1098,6 +1115,119 @@ App.controller('QiniuFileUploadController', ['$scope', '$rootScope', '$timeout',
                 });
     };
 }]);
+/**=========================================================
+ * Module: ResultController.js
+ =========================================================*/
+
+ App.controller('ResultController', ['$scope', '$http', '$rootScope', '$state', 
+    function ($scope, $http, $rootScope, $state) {
+
+        //***需要替换为从后台获取的数据***
+        $scope.data = [
+        {
+            id : "0",
+            level : "0",
+            index_name : "政治工作",
+            standard_date : "2018-04-26",
+            items :
+            [
+            {
+                id : "1",
+                department_id : "1",
+                index_name: "学习",
+                increase_name : "好好学习",
+                increase_point : 2,
+                increase_unit: "次",
+                decrease_name : "没出操",
+                decrease_point : 1,
+                decrease_unit: "次",
+                level : "1",
+                father_id : "0",
+            },
+            {
+                id : "2",
+                department_id : "1",
+                index_name: "党务",
+                increase_name : "好好学习",
+                increase_point : 2,
+                increase_unit: "次",
+                decrease_name : "没出操",
+                decrease_point : 1,
+                decrease_unit: "次",
+                level : "1",
+                father_id : "0",
+            }
+            ]
+
+        },
+        {
+            id : "3",
+            level : "0",
+            index_name : "训练工作",
+            items :
+            [
+            {
+                id : "4",
+                department_id : "1",
+                index_name: "党务",
+                increase_name : "好好学习",
+                increase_point : 2,
+                increase_unit: "次",
+                decrease_name : "没出操",
+                decrease_point : 1,
+                decrease_unit: "次",
+                level : "1",
+                father_id : "3",
+            },
+            {
+             id : "5",
+             department_id : "1",
+             index_name: "党务",
+             increase_name : "好好学习",
+             increase_point : 2,
+             increase_unit: "次",
+             decrease_name : "没出操",
+             decrease_point : 1,
+             decrease_unit: "次",
+             level : "1",
+             father_id : "3",
+         }
+         ]
+     }
+     ];
+
+    var
+    buildParam = function (url) {
+        var param = {
+            method: 'GET',
+            url: url,
+            params: $scope.search
+        };
+        return param;
+    },
+    loadData = function (url) {
+            // $http(buildParam(url))
+            //     .then(function (response) {
+            //         if (response.data.status === 200) {
+            //             $scope.data = response.data.data.list;
+            //         } else {
+            //             $.notify(response.data.message, 'danger');
+            //         }
+            //     }, function (x) {
+            //         $.notify('服务器出了点问题，我们正在处理', 'danger');
+            //     });
+        };
+
+
+
+        $(window).resize(function () {
+            var d = $('#container');
+            d.height($(window).height() - d.offset().top);
+        });
+        $(window).resize();
+
+    }]);
+
 /**=========================================================
  * Module: SearchController.js
  =========================================================*/

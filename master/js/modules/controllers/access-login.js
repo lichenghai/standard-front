@@ -8,7 +8,7 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
     $scope.authMsg = '';
 
     $scope.login = function () {
-        $scope.authMsg = 'oh no';
+        $scope.authMsg = '欢迎登陆';
         $state.go('app.account');
         
 
