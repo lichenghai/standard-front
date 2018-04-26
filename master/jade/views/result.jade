@@ -1,71 +1,81 @@
-h3 绩效查看
+h3 提交成功！
+style.
+    tr th {
+        text-align:center;
+    }
+    tbody tr td {
+        text-align:center;
+    }
+    input {
+        text-align:center;
+    }
 
+.form-group
+    p
+        span.h4 日期：
+        span
+            .input-group.col-md-2
+                input.form-control(type='text', placeholder='选择日期', ng-model='timeStart', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭')
+                span.input-group-btn
+                    button.btn.btn-default(type='button', ng-click='open($event, "start")')
+                        em.fa.fa-calendar
+hr
 #container.row(style='overflow-y: scroll')
-    .col-lg-9
+
+    .col-md-12        
         // START panel
         .panel.panel-default
-            tabset
-                tab(heading='搜索结果')
+                .form-group(ng-repeat='data_i in data')
                     // START table-responsive
+                    h4(style="text-align:center") {{data_i.index_name}}
+                    hr
                     .table-responsive
-                        table.table.table-condensed.table-bordered.table-hover
+                        table.table.table-bordered.table-condensed.table-hover
                             thead
                                 tr
-                                    th.col-lg-1 序号
-                                    th.col-lg-2 日期
-                                    th.col-lg-2 指标
-                                    th.col-lg-1 得分
-                                    th.col-lg-3 领导评语
-                                    th 操作
-                            tbody(ng-repeat='item in items')
+                                    th.col-sm-1 序号
+                                    th.col-md-1 指标名称 
+                                    th.col-md-1 加分内容
+                                    th.col-sm-2 数量
+                                    th.col-md-1 加分情况说明
+                                    th.col-md-1 减分内容
+                                    th.col-sm-2 数量
+                                    th.col-md-1 减分情况说明
+                                    th.col-md-1 得分
+                                    th.col-md-1 操作
+                            tbody(ng-repeat='item in data_i.items')
                                 tr
                                     td {{$index+1}}
-                                    td {{item.standardDate | date:'yyyy-MM-dd':'UTC'}}
-                                    td {{item.indexName}}
-                                    td {{item.totalPoint}}
-                                    td {{item.leaderName}}：{{item.leaderComment}}
+                                    td {{item.index_name}}
+                                    td {{item.increase_name}}({{item.increase_point}}分/{{item.increase_unit}})
+                                    td 
+                                        button.btn(ng-click="operate(item, 0, -1)") 
+                                            i.fa.fa-minus
+                                        input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="item.increase_num")
+                                        button.btn(ng-click="operate(item, 0, 1)")
+                                            i.fa.fa-plus
+                                    td 
+                                        input(style="text-align: center;" type="text" placeholder="" ng-model="item.increase_detail")
+                                    td {{item.decrease_name}}(-{{item.decrease_point}}分/{{item.decrease_unit}})
+                                    td 
+                                        button.btn(ng-click="operate(item, 1, -1)") 
+                                            i.fa.fa-minus
+                                        input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="item.decrease_num")
+                                        button.btn(ng-click="operate(item, 1, 1)")
+                                            i.fa.fa-plus
+                                    td 
+                                        input(style="text-align: center;" type="text" placeholder="" ng-model="item.decrease_detail")
+                                    td {{item.total_point}}
                                     td
-                                        button.btn.btn-link(type='button', ng-click='alert("id:"+item.id)')
-                                            span 查看当日
+                                        button.btn.btn-link(type='button', ng-click='reset(item)')
+                                            span 清空
                             tfoot
                                 tr(ng-if='results.length===0')
                                     td(colspan='11') 暂无数据
                     // END table-responsive
-                    .row
-                        .col-lg-6
-                        .col-lg-6.text-right
-                            pagination.pagination-sm(total-items='totalItems', ng-model='search.page', ng-change='pageChanged()', items-per-page='search.size', max-size='5', boundary-links='true', previous-text='‹', next-text='›', first-text='«', last-text='»')
+                    hr
 
-
-    form.col-lg-3(name='filtrate')
-        h3.m0.pb-lg 筛选
-
-            p
-                .input-group
-                    input.form-control(type='text', placeholder='开始日期', ng-model='timeStart', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭')
-                    span.input-group-btn
-                        button.btn.btn-default(type='button', ng-click='open($event, "start")')
-                            em.fa.fa-calendar
-            p
-                .input-group
-                    input.form-control(type='text', placeholder='截止日期', ng-model='timeEnd', datepicker-popup='{{format}}', is-open='opened.end', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭')
-                    span.input-group-btn
-                        button.btn.btn-default(type='button', ng-click='open($event, "end")')
-                            em.fa.fa-calendar
-
-            .form-group
-                label.col-lg-4.h4 类型
-                .col-lg-8
-                    select.form-control(ng-options=' item.key as item.value for item in IncreaseTypeList', ng-model='search.increaseType')
-                    .form-group.text-right
-
-            .form-group
-                label.col-lg-4.h4 含评语
-                .col-lg-8
-                    select.form-control(ng-options=' item.key as item.value for item in CommentTypeList', ng-model='search.commentType')
-                    .form-group.text-right
-            p
-                button.btn.btn-block.btn-success(type='button', ng-click='searchList()') 查找
-            p
-                button.btn.btn-block.btn-default(type='button', ng-click='resetSearch()') 重置
-
+                p
+                    span
+                        button.btn.btn-block.btn-success(type='button', ng-click='submit()') 提交
+        

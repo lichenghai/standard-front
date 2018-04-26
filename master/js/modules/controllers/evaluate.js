@@ -5,6 +5,7 @@
  App.controller('EvaluateController', ['$scope', '$http', '$rootScope',
     function ($scope, $http, $rootScope) {
 
+        //***需要替换为从后台获取的数据***
         $scope.data = [
         {
             id : "0",
@@ -61,23 +62,31 @@
                 father_id : "3",
             },
             {
-             id : "5",
-             department_id : "1",
-             index_name: "党务",
-             increase_name : "好好学习",
-             increase_point : 2,
-             increase_unit: "次",
-             decrease_name : "没出操",
-             decrease_point : 1,
-             decrease_unit: "次",
-             level : "1",
-             father_id : "3",
-         }
-         ]
-     }
-     ];
+               id : "5",
+               department_id : "1",
+               index_name: "党务",
+               increase_name : "好好学习",
+               increase_point : 2,
+               increase_unit: "次",
+               decrease_name : "没出操",
+               decrease_point : 1,
+               decrease_unit: "次",
+               level : "1",
+               father_id : "3",
+           }
+           ]
+       }
+       ];
 
-     $scope.operate = function(item, index, step){
+    //***需要替换为从后台获取的数据***
+    $rootScope.person = {
+        person_id : 0,
+        username : "李成海",
+        department_id : 0,
+        department_name : "训练处"
+    };
+
+    $scope.operate = function(item, index, step){
         if (index === 0){
             var val = item.increase_num;
             item.increase_num = doPlus(val, step);
@@ -86,10 +95,10 @@
             var val = item.decrease_num;
             item.decrease_num = doPlus(val, step);
         }
-        if (isNaN(item.increase_num)){
+        if (isNaN(item.increase_num) || item.increase_num===""){
             item.increase_num = 0;
         }
-        if (isNaN(item.decrease_num)){
+        if (isNaN(item.decrease_num) || item.decrease_num===""){
             item.decrease_num = 0;
         }
         item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
@@ -130,25 +139,78 @@
             //     });
         };
 
-        $scope.person = {
-            person_id : "0",
-            username : "李成海",
-            department_id : "0",
-            department_name : "训练处"
-        };
+        
 
         $scope.submit = function(){
+
             var dataPost = {};
-            dataPost.person = $scope.person;
-            dataPost.result = [];
+
+            //所有条目都相同的部分
+            dataPost.person_id = $rootScope.person.person_id;
+            dataPost.department_id = $rootScope.person.department_id;
+            dataPost.department_name = $rootScope.person.department_name;
+            dataPost.standard_date = $scope.datePicked;
+            dataPost.submit_time = new Date().toLocaleTimeString();
+            //每个条目不同的部分
+            //对于每个大项
             $scope.data.forEach(function(data_i, index){
+                var hasValue = false;
+                //对于每个小条目
                 data_i.items.forEach(function(item, index){
-                    if (item.level==="0" || !isNaN(item.total_point)) {
-                        dataPost.result.push(item);
-                    }
-                });
+                    //对于总分是有效数字的条目
+                    if (!isNaN(item.total_point) && item.total_point!==""){
+                        //***需要服务端提供***
+                        var father_id = 0;
+                        
+                        //如果大项还没加入过，先提交大项条目，获取father_id
+                        if (!hasValue){
+                            dataPost.index_name = data_i.index_name;
+                            dataPost.level = data_i.level;
+                            // $http.post('/url', dataPost).then(function (response) {
+                            //     if (response.data.status === 200) {
+                            //         father_id = response.data.data;
+                            //     } else {
+                            //         $.notify(response.data.message, 'danger');
+                            //     }
+                            // }, function (x) {
+                            //     $.notify('服务器出了点问题，我们正在处理', 'danger');
+                            // });
+                            hasValue = true;
+                        }
+
+                        //提交该小条目
+                        dataPost.index_name = item.index_name;
+                        dataPost.increase_name = item.increase_name;
+                        dataPost.increase_num = item.increase_num;
+                        dataPost.increase_point = item.increase_point;
+                        dataPost.increase_unit = item.increase_unit;
+                        dataPost.increase_detail = item.increase_detail;
+                        dataPost.decrease_name = item.decrease_name;
+                        dataPost.decrease_num = item.decrease_num;
+                        dataPost.decrease_podet = item.decrease_podet;
+                        dataPost.decrease_unit = item.decrease_unit;
+                        dataPost.decrease_detail = item.decrease_detail;
+                        dataPost.total_point = item.total_point;
+                        dataPost.level = item.level;
+                        dataPost.father_id = father_id;
+                        
+                        // $http.post('/url', dataPost).then(function (response) {
+                            //     if (response.data.status === 200) {
+                            //         
+                            //     } else {
+                            //         $.notify(response.data.message, 'danger');
+                            //           break;
+                            //     }
+                            // }, function (x) {
+                            //     $.notify('服务器出了点问题，我们正在处理', 'danger');
+                            //     break;
+                            // });
+                            alert(dataPost.total_point + dataPost.submit_time);
+                        }
+
+                    });
+
             });
-            alert(dataPost.result[0].total_point);
         };
 
         $scope.reset = function(item){
@@ -167,8 +229,8 @@
         };
 
         //把日期格式2018/04/20替换为2018-04-20
-        $scope.timeStart = (new Date()).toLocaleDateString().replace(/\//g,'-');
-        $scope.timeEnd = '';
+        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g,'-');
+        //页面载入时日历是否自动打开
         $scope.opened = {
             start: false,
             end: false
@@ -183,7 +245,6 @@
         $scope.open = function ($event, attr) {
             $event.preventDefault();
             $event.stopPropagation();
-
             $scope.opened[attr] = true;
         };
 

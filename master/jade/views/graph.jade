@@ -29,7 +29,7 @@ script.
             var ctx = $("#myChart").get(0).getContext("2d");
             // This will get the first returned node in the jQuery collection.
             var myNewChart = new Chart(ctx);
-            new Chart(ctx).PolarArea(data);
+            var chart = new Chart(ctx).PolarArea(data);
 
 #container.row(style='overflow-y: scroll')
     .col-lg-9

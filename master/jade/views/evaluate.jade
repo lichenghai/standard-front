@@ -9,16 +9,19 @@ style.
     input {
         text-align:center;
     }
-.input-group.col-md-2
-    input.form-control(type='text', placeholder='选择日期', ng-model='timeStart', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭')
-    span.input-group-btn
-        button.btn.btn-default(type='button', ng-click='open($event, "start")')
-            em.fa.fa-calendar
+
+.form-group
+    p
+        span.h4 日期：
+        span
+            .input-group.col-sm-2
+                input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions',defaultViewDate='today', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true')
+                span.input-group-btn
+                    button.btn.btn-default(type='button', ng-click='open($event, "start")')
+                        em.fa.fa-calendar
 hr
 #container.row(style='overflow-y: scroll')
-    .col-md-12        
-        // START panel
-        .panel.panel-default
+    .col-sm-12(style='background-color:white')        
                 .form-group(ng-repeat='data_i in data')
                     // START table-responsive
                     h4(style="text-align:center") {{data_i.index_name}}
@@ -28,15 +31,15 @@ hr
                             thead
                                 tr
                                     th.col-sm-1 序号
-                                    th.col-md-1 指标名称 
-                                    th.col-md-1 加分内容
+                                    th.col-sm-1 指标名称 
+                                    th.col-sm-1 加分内容
                                     th.col-sm-2 数量
-                                    th.col-md-1 加分情况说明
-                                    th.col-md-1 减分内容
+                                    th.col-sm-1 加分情况说明
+                                    th.col-sm-1 减分内容
                                     th.col-sm-2 数量
-                                    th.col-md-1 减分情况说明
-                                    th.col-md-1 得分
-                                    th.col-md-1 操作
+                                    th.col-sm-1 减分情况说明
+                                    th.col-sm-1 得分
+                                    th.col-sm-1 操作
                             tbody(ng-repeat='item in data_i.items')
                                 tr
                                     td {{$index+1}}
