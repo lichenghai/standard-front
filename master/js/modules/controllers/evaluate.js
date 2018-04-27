@@ -62,21 +62,21 @@
                 father_id : "3",
             },
             {
-             id : "5",
-             department_id : "1",
-             index_name: "党务",
-             increase_name : "好好学习",
-             increase_point : 2,
-             increase_unit: "次",
-             decrease_name : "没出操",
-             decrease_point : 1,
-             decrease_unit: "次",
-             level : "1",
-             father_id : "3",
-         }
-         ]
-     }
-     ];
+               id : "5",
+               department_id : "1",
+               index_name: "党务",
+               increase_name : "好好学习",
+               increase_point : 2,
+               increase_unit: "次",
+               decrease_name : "没出操",
+               decrease_point : 1,
+               decrease_unit: "次",
+               level : "1",
+               father_id : "3",
+           }
+           ]
+       }
+       ];
 
     //***需要替换为从后台获取的数据***
     $rootScope.person = {
@@ -231,6 +231,7 @@
         };
 
         $scope.reset = function(item){
+            $scope.totalPoints -= item.total_point;
             item.increase_num = "";
             item.increase_detail = "";
             item.decrease_num = "";
@@ -240,7 +241,10 @@
         $scope.resetAll = function(){
             $scope.data.forEach(function(data_i, index){
                 data_i.items.forEach(function(item){
-                    $scope.reset(item);
+                    //对于总分是有效数字的条目
+                    if (!isNaN(item.total_point) && item.total_point!==""){
+                        $scope.reset(item);
+                    }
                 });
             });
         };
