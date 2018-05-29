@@ -17,55 +17,9 @@ h4  账户信息
               .form-control
                a(href='', ng-dialog='password', ng-dialog-data='{{account}}', ng-click='isPassword=true', ng-dialog-close-by-document='false') 点此修改密码
           .form-group
-            label.col-lg-2.control-label 简称
-            .col-lg-10
-              .form-control {{account.cname}}
-          .form-group
-            label.col-lg-2.control-label 全称
-            .col-lg-10
-              .form-control {{account.fullname}}
-          .form-group
-            label.col-lg-2.control-label LOGO
-            .col-lg-10
-              img.thumb128(ng-src='{{account.logopath}}')
-              a(href='', ng-dialog='upload', ng-click='isPassword=false') 点击修改
-          .form-group
-            label.col-lg-2.control-label 联系人
-            .col-lg-10
-              input.form-control(type='text', placeholder='联系人', ng-model='account.contactperson')
-          .form-group
             label.col-lg-2.control-label 联系电话
             .col-lg-10
               input.form-control(type='text', placeholder='联系电话', ng-model='account.telephone')
-          .form-group
-            label.col-lg-2.control-label 所在地区
-            .col-lg-10
-              .form-control {{account.area}}
-          .form-group
-            label.col-lg-2.control-label 地址
-            .col-lg-10
-              input.form-control(type='text', placeholder='地址', ng-model='account.address')
-          .form-group
-            label.col-lg-2.control-label 二维码
-            .col-lg-10
-              img.thumb128(ng-src='{{account.qrcode}}')
-              a(href='{{account.qrcode}}', download) 点击下载
-          .form-group
-            label.col-lg-2.control-label 微网页
-            .col-lg-10
-              a(href='{{account.weiurl}}', ng-click='alert("请复制后用微信客户端打开！");') {{account.weiurl}}
-          .form-group
-            label.col-lg-2.control-label 商户类型
-            .col-lg-10
-              .form-control {{account.businessscope}}
-          .form-group
-            label.col-lg-2.control-label 代理商
-            .col-lg-10
-              .form-control {{account.sales}}
-          //.form-group
-          //  label.col-lg-2.control-label 接收广告
-          //  .col-lg-10
-          //    .form-control 是
           .form-group
             .col-lg-offset-2.col-lg-10
               button.btn.btn-sm.btn-success(ng-click='saveAccount()') 保存

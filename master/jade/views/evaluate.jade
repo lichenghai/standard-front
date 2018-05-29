@@ -10,10 +10,13 @@ style.
         text-align:center;
     }
 
-
 p 
-    span.col-sm-2 姓名：{{person.username}}
-    span 部门：{{person.department_name}}
+    span.col-sm-2 姓名：{{$root.account.username}}
+    form.form-horizontal
+        label.col-lg-3.control-label 选择部门
+        .col-lg-3
+            select.form-control(ng-options='item.departmentName for item in relations', ng-model='department',ng-change='changeDepartment()')
+            .form-group.text-right
 
 hr
 

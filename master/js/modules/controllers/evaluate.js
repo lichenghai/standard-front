@@ -5,8 +5,54 @@
  App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state', 
     function ($scope, $http, $rootScope, $state) {
 
+       var loadRelations = function () {
+           $http.get('/apis/remove-me/account-service/relations/list?personId='+$rootScope.account.id)
+               .then(function (response) {
+                   if (response.data.status === 200) {
+                       $scope.relations = response.data.data;
+                       $scope.department= $scope.relations[0];
+                       loadIndex();
+                       console.log("get user departments:"+JSON.stringify($scope.relations))
+                   } else {
+                       $.notify(response.data.message, 'danger');
+                   }
+               }, function (x) {
+                   $.notify('服务器出了点问题，我们正在处理', 'danger');
+               });
+       }
+        var loadIndex = function () {
+
+            $http.get('/apis/remove-me/standard-service/detail/list?departmentId='+$scope.department.id+'&level=0')
+                .then(function (response) {
+                    if (response.data.status === 200) {
+                        $scope.data = response.data.data;
+                        console.log("data.size:"+$scope.data.length)
+                        $scope.data.forEach(function (item) {
+                            console.log("item:"+item.indexName);
+                            $http.get('/apis/remove-me/standard-service/detail/list?fatherId='+item.id+'&level=1')
+                                .then(function (response) {
+                                    console.log("get response:"+item.indexName);
+                                    if (response.data.status === 200) {
+                                        item['items'] = response.data.data;
+                                    } else {
+                                        $.notify(response.data.message, 'danger');
+                                    }
+                                }, function (x) {
+                                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                });
+                        })
+                    } else {
+                        $.notify(response.data.message, 'danger');
+                    }
+                }, function (x) {
+                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                });
+        }
+
+        $scope.changeDepartment =loadIndex;
+
         //***需要替换为从后台获取的数据***
-        $scope.data = [
+   /*     $scope.data = [
         {
             id : "0",
             level : "0",
@@ -76,15 +122,7 @@
            }
            ]
        }
-       ];
-
-    //***需要替换为从后台获取的数据***
-    $rootScope.person = {
-        person_id : 0,
-        username : "李成海",
-        department_id : 0,
-        department_name : "训练处"
-    };
+       ];*/
 
     $scope.totalPoints = 0;
 
@@ -274,5 +312,5 @@
             d.height($(window).height() - d.offset().top);
         });
         $(window).resize();
-
+        loadRelations();
     }]);
