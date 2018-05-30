@@ -52,7 +52,7 @@ App.controller('SearchController', ['$scope', '$http', '$rootScope',
             buildParam = function () {
                 var param = {
                     method: 'GET',
-                    url: '/apis/remove-me/standard-service/result/search',
+                    url:$rootScope.url+'/standard-service/result/search',
                     params: $scope.search
                 };
                 return param;

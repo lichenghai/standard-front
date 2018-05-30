@@ -61,19 +61,6 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     resolve: helper.resolveFor('ngDialog', 'chartjs'),
                     controller: 'GraphController'
                 })
-                .state('app.account', {
-                    url: '/account',
-                    title: ' 账户信息',
-                    templateUrl: helper.basepath('account.html'),
-                    resolve: helper.resolveFor('ngDialog', 'ngImgCrop', 'filestyle', 'angularFileUpload'),
-                    controller: 'AccountController'
-                })
-                .state('app.adstatistics', {
-                    url: '/adstatistics',
-                    title: '评论统计',
-                    templateUrl: helper.basepath('adstatistics.html')   ,
-                    controller: 'AdstatisticsController'
-                })
                 .state('login', {
                     url: '/login',
                     title: '登录',

@@ -2,60 +2,32 @@
  * Module: GraphController.js
  =========================================================*/
 
- App.controller('GraphController', ['$scope', '$http', '$rootScope',
+App.controller('GraphController', ['$scope', '$http', '$rootScope',
     function ($scope, $http, $rootScope) {
         var chartData = {
             labels: [],
             datasets: [
-            {
-                label: "My First dataset",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
-                data: []
-            },
+                {
+                    label: "My First dataset",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: []
+                },
             ]
         };
-
-        //***需要替换为从后台获取的数据***
-        $scope.data = [
-        {
-            standard_date : "2018-04-24",
-            total_point: 60,
-        },
-        {           
-            standard_date : "2018-04-25",
-            total_point: 100,
-        },
-        {
-            standard_date : "2018-04-26",
-            total_point: 80,
-        },
-        {           
-            standard_date : "2018-04-27",
-            total_point: 100,
-        },
-        {           
-            standard_date : "2018-04-28",
-            total_point: 70,
-        },
-        {           
-            standard_date : "2018-04-29",
-            total_point: 90,
-        },
-        ];
-
-        $scope.data.forEach(function(data_i, index){
-            chartData.labels.push(data_i.standard_date);
-            chartData.datasets[0].data.push(data_i.total_point);
-        });
-
+        $scope.search = {
+            personId: $rootScope.account.id,
+            departmentId: 0,
+            timeStart: '',
+            timeEnd: '',
+        };
         var chartOptions = {
             // ///Boolean - Whether grid lines are shown across the chart
-            scaleShowGridLines : true,
+            scaleShowGridLines: true,
 
             // //String - Colour of the grid lines
             // scaleGridLineColor : "rgba(0,0,0,.05)",
@@ -102,20 +74,112 @@
         };
         // Get context with jQuery - using jQuery's .get() method.
         var ctx = $("#myChart").get(0).getContext("2d");
-            // This will get the first returned node in the jQuery collection.
-            var myNewChart = new Chart(ctx);
-            myNewChart.Line(chartData, chartOptions);
+        // This will get the first returned node in the jQuery collection.
+        var myNewChart = new Chart(ctx);
 
+        myNewChart.Line(chartData, chartOptions);
+        var
+            buildParam = function () {
+                var param = {
+                    method: 'GET',
+                    url: $rootScope.url + '/standard-service/statics/search',
+                    params: $scope.search
+                };
+                return param;
+            }, loadData = function () {
+                $http(buildParam())
+                    .then(function (response) {
+                        if (response.data.status === 200) {
+                            $scope.data = response.data.data;
+                            $scope.data.forEach(function (data_i, index) {
+                                chartData.labels.push(data_i.recordDate);
+                                chartData.datasets[0].data.push(data_i.score);
+                            });
+                        } else {
+                            $.notify(response.data.message, 'danger');
+                        }
+                    }, function (x) {
+                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                    });
+            },            resetList = function () {
+                if (!!$scope.timeStart) {
+                    var date = new Date($scope.timeStart);
+                    $scope.search.timeStart = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
+                }
+
+                if (!!$scope.timeEnd) {
+                    var date = new Date($scope.timeEnd);
+                    $scope.search.timeEnd = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59';
+                }
+
+                loadData();
+            }, loadRelations = function () {
+                $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
+                    .then(function (response) {
+                        if (response.data.status === 200) {
+                            $scope.relations = response.data.data;
+                            $scope.department = $scope.relations[0];
+                            loadIndex();
+                        } else {
+                            $.notify(response.data.message, 'danger');
+                        }
+                    }, function (x) {
+                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                    });
+            };
+        $scope.searchList = resetList;
+        $scope.resetSearch = function () {
+            $scope.search.departmentId = 0;
+            $scope.search.timeStart = '';
+            $scope.search.timeEnd = '';
             $scope.timeStart = '';
             $scope.timeEnd = '';
-            $scope.opened = {
-                start: false,
-                end: false
-            };
-            $scope.open = function ($event, attr) {
-                $event.preventDefault();
-                $event.stopPropagation();
+            resetList();
+        };
+        //***需要替换为从后台获取的数据***
+        /* $scope.data = [
+             {
+                 standard_date: "2018-04-24",
+                 total_point: 60,
+             },
+             {
+                 standard_date: "2018-04-25",
+                 total_point: 100,
+             },
+             {
+                 standard_date: "2018-04-26",
+                 total_point: 80,
+             },
+             {
+                 standard_date: "2018-04-27",
+                 total_point: 100,
+             },
+             {
+                 standard_date: "2018-04-28",
+                 total_point: 70,
+             },
+             {
+                 standard_date: "2018-04-29",
+                 total_point: 90,
+             },
+         ];*/
 
-                $scope.opened[attr] = true;
-            };
-        }]);
+
+
+        $scope.timeStart = '';
+        $scope.timeEnd = '';
+        $scope.opened = {
+            start: false,
+            end: false
+        };
+
+        $scope.open = function ($event, attr) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            $scope.opened[attr] = true;
+        };
+
+        resetList();
+        loadRelations();
+    }]);

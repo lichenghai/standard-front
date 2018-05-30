@@ -17,7 +17,7 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
         if (window.location.href.indexOf('indexing') > 0) {
             $rootScope.url = 'www.standard.com';
         } else {
-            $rootScope.url = 'http://localhost:8888/indexing';
+            $rootScope.url = '/apis/remove-me';
         }
 
         // Uncomment this to disable template cache

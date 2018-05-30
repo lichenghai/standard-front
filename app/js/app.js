@@ -17,7 +17,7 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
         if (window.location.href.indexOf('indexing') > 0) {
             $rootScope.url = 'www.standard.com';
         } else {
-            $rootScope.url = 'http://localhost:8888/indexing';
+            $rootScope.url = '/apis/remove-me';
         }
 
         // Uncomment this to disable template cache
@@ -112,19 +112,6 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                     templateUrl: helper.basepath('graph.html'),
                     resolve: helper.resolveFor('ngDialog', 'chartjs'),
                     controller: 'GraphController'
-                })
-                .state('app.account', {
-                    url: '/account',
-                    title: ' 账户信息',
-                    templateUrl: helper.basepath('account.html'),
-                    resolve: helper.resolveFor('ngDialog', 'ngImgCrop', 'filestyle', 'angularFileUpload'),
-                    controller: 'AccountController'
-                })
-                .state('app.adstatistics', {
-                    url: '/adstatistics',
-                    title: '评论统计',
-                    templateUrl: helper.basepath('adstatistics.html')   ,
-                    controller: 'AdstatisticsController'
                 })
                 .state('login', {
                     url: '/login',
@@ -361,96 +348,30 @@ App
  * Module: access-login.js
  =========================================================*/
 
-App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state', function ($scope,$rootScope, $http, $state) {
+App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state', function ($scope, $rootScope, $http, $state) {
 
     $scope.account = {};
     $scope.authMsg = '';
 
     $scope.login = function () {
-        $scope.authMsg = '欢迎登陆';
-        $state.go('app.account');
-        
+        $scope.authMsg = '正在登陆中...';
+        //$state.go('app.evaluate');
 
-       // $http
-       //      .post('/apis/remove-me/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
-       //      .then(function (response) {
-       //          if (response.data.status!=200) {
-       //              $scope.authMsg = response.data.message;
-       //          } else {
-        //          $rootScope.account=response.data.data;
-       //              $state.go('app.account');
-       //          };
-       //      }, function (x) {
-       //          $scope.authMsg = '服务器出了点问题，我们正在处理';
-       //      });
-    };
-
-}]);
-
-/**=========================================================
- * Module: account.js
- =========================================================*/
-
-App.controller('AccountController', ['$scope', '$rootScope', '$http', function ($scope, $rootScope, $http) {
-
-    $scope.$on('ngDialog.opened', function (event, $dialog) {
-        if (!$scope.isPassword)
-            $dialog.find('.ngdialog-content').css('width', '80%');
-    });
-
-    $http
-        .get('/nongyequan-server/person/get?id=')
-        .then(function (response) {
-            if (response.data.status) {
-                $rootScope.account = response.data.data;
-            } else {
-                $.notify(response.data.msg, 'danger');
-            }
-        }, function (x) {
-            $.notify('服务器出了点问题，我们正在处理', 'danger');
-        });
-
-    $rootScope.saveAccount = function () {
-        var param = 'password=' + $scope.account.password
-            + '&businessname=' + $scope.account.cname
-            + '&businessfullname=' + $scope.account.fullname
-            + '&contactperson=' + $scope.account.contactperson
-            + '&telephone=' + $scope.account.telephone
-            + '&address=' + $scope.account.address;
         $http
-            .post('/nongyequan-server/editaccount.action?' + param)
+            .post($rootScope.url+'/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
             .then(function (response) {
-                if (response.data.status) {
-                    $.notify('成功', 'success');
+                if (response.data.status != 200) {
+                    $scope.authMsg = response.data.message;
                 } else {
-                    $.notify(response.data.msg, 'danger');
+                    $rootScope.account = response.data.data;
+                    $state.go('app.evaluate');
                 }
+                ;
             }, function (x) {
-                $.notify('服务器出了点问题，我们正在处理', 'danger');
+                $scope.authMsg = '服务器出了点问题，我们正在处理';
             });
     };
 
-    $(window).resize(function () {
-        var d = $('#container');
-        d.height($(window).height() - d.offset().top );
-    });
-    $(window).resize();
-}]);
-
-App.controller('PasswordCtrl', ['$scope', '$rootScope', function ($scope, $rootScope) {
-    $scope.change = function () {
-        if ($scope.ngDialogData.password != $scope.password.old) {
-            $.notify('原密码错误', 'danger');
-        } else if (!$scope.password.cur) {
-            $.notify('请输入新密码', 'danger');
-        } else if ($scope.password.cur != $scope.password.dup) {
-            $.notify('两次密码不一致', 'danger');
-        } else {
-            $rootScope.account.password = $scope.password.cur;
-            $rootScope.saveAccount();
-            $scope.closeThisDialog();
-        }
-    }
 }]);
 
 /**=========================================================
@@ -546,152 +467,184 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
  * Module: EvaluateController.js
  =========================================================*/
 
- App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state', 
+App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
     function ($scope, $http, $rootScope, $state) {
+        var loadRelations = function () {
+            $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
+                .then(function (response) {
+                    if (response.data.status === 200) {
+                        $scope.relations = response.data.data;
+                        $scope.department = $scope.relations[0];
+                        loadIndex();
+                    } else {
+                        $.notify(response.data.message, 'danger');
+                    }
+                }, function (x) {
+                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                });
+        }
+        var loadIndex = function () {
+
+            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
+                .then(function (response) {
+                    if (response.data.status === 200) {
+                        $scope.data = response.data.data;
+                        $scope.data.forEach(function (item) {
+                            $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
+                                .then(function (response) {
+                                    if (response.data.status === 200) {
+                                        item['items'] = response.data.data;
+                                    } else {
+                                        $.notify(response.data.message, 'danger');
+                                    }
+                                }, function (x) {
+                                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                });
+                        })
+                    } else {
+                        $.notify(response.data.message, 'danger');
+                    }
+                }, function (x) {
+                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                });
+        }
+
+        $scope.changeDepartment = loadIndex;
 
         //***需要替换为从后台获取的数据***
-        $scope.data = [
-        {
-            id : "0",
-            level : "0",
-            index_name : "政治工作",
-            items :
-            [
-            {
-                id : "1",
-                department_id : "1",
-                index_name: "学习",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                level : "1",
-                father_id : "0",
-            },
-            {
-                id : "2",
-                department_id : "1",
-                index_name: "党务",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                level : "1",
-                father_id : "0",
+        /*     $scope.data = [
+             {
+                 id : "0",
+                 level : "0",
+                 index_name : "政治工作",
+                 items :
+                 [
+                 {
+                     id : "1",
+                     department_id : "1",
+                     index_name: "学习",
+                     increase_name : "好好学习",
+                     increase_point : 2,
+                     increase_unit: "次",
+                     decrease_name : "没出操",
+                     decrease_point : 1,
+                     decrease_unit: "次",
+                     level : "1",
+                     father_id : "0",
+                 },
+                 {
+                     id : "2",
+                     department_id : "1",
+                     index_name: "党务",
+                     increase_name : "好好学习",
+                     increase_point : 2,
+                     increase_unit: "次",
+                     decrease_name : "没出操",
+                     decrease_point : 1,
+                     decrease_unit: "次",
+                     level : "1",
+                     father_id : "0",
+                 }
+                 ]
+
+             },
+             {
+                 id : "3",
+                 level : "0",
+                 index_name : "训练工作",
+                 items :
+                 [
+                 {
+                     id : "4",
+                     department_id : "1",
+                     index_name: "党务",
+                     increase_name : "好好学习",
+                     increase_point : 2,
+                     increase_unit: "次",
+                     decrease_name : "没出操",
+                     decrease_point : 1,
+                     decrease_unit: "次",
+                     level : "1",
+                     father_id : "3",
+                 },
+                 {
+                    id : "5",
+                    department_id : "1",
+                    index_name: "党务",
+                    increase_name : "好好学习",
+                    increase_point : 2,
+                    increase_unit: "次",
+                    decrease_name : "没出操",
+                    decrease_point : 1,
+                    decrease_unit: "次",
+                    level : "1",
+                    father_id : "3",
+                }
+                ]
             }
-            ]
+            ];*/
 
-        },
-        {
-            id : "3",
-            level : "0",
-            index_name : "训练工作",
-            items :
-            [
-            {
-                id : "4",
-                department_id : "1",
-                index_name: "党务",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                level : "1",
-                father_id : "3",
+        $scope.totalPoints = 0;
+
+        $scope.operate = function (item, index, step) {
+            if (index === 0) {
+                var val = item.increase_num;
+                item.increase_num = doPlus(val, step);
+            }
+            else if (index === 1) {
+                var val = item.decrease_num;
+                item.decrease_num = doPlus(val, step);
+            }
+            if (isNaN(item.increase_num) || item.increase_num === "") {
+                item.increase_num = 0;
+            }
+            if (isNaN(item.decrease_num) || item.decrease_num === "") {
+                item.decrease_num = 0;
+            }
+            if (!isNaN(item.total_point)) {
+                $scope.totalPoints -= item.total_point;
+            }
+            item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
+            $scope.totalPoints += item.total_point;
+        };
+
+        var doPlus = function (val, step) {
+            if (isNaN(val)) {
+                val = 0;
+            }
+            val = Math.abs(val);
+            val = Math.floor(val);
+            val += step;
+            if (val < 0) {
+                val = 0;
+            }
+            return val;
+        };
+
+        var
+            buildParam = function (url) {
+                var param = {
+                    method: 'GET',
+                    url: url,
+                    params: $scope.search
+                };
+                return param;
             },
-            {
-               id : "5",
-               department_id : "1",
-               index_name: "党务",
-               increase_name : "好好学习",
-               increase_point : 2,
-               increase_unit: "次",
-               decrease_name : "没出操",
-               decrease_point : 1,
-               decrease_unit: "次",
-               level : "1",
-               father_id : "3",
-           }
-           ]
-       }
-       ];
+            loadData = function (url) {
+                // $http(buildParam(url))
+                //     .then(function (response) {
+                //         if (response.data.status === 200) {
+                //             $scope.data = response.data.data.list;
+                //         } else {
+                //             $.notify(response.data.message, 'danger');
+                //         }
+                //     }, function (x) {
+                //         $.notify('服务器出了点问题，我们正在处理', 'danger');
+                //     });
+            };
 
-    //***需要替换为从后台获取的数据***
-    $rootScope.person = {
-        person_id : 0,
-        username : "李成海",
-        department_id : 0,
-        department_name : "训练处"
-    };
 
-    $scope.totalPoints = 0;
-
-    $scope.operate = function(item, index, step){
-        if (index === 0){
-            var val = item.increase_num;
-            item.increase_num = doPlus(val, step);
-        }
-        else if (index === 1){
-            var val = item.decrease_num;
-            item.decrease_num = doPlus(val, step);
-        }
-        if (isNaN(item.increase_num) || item.increase_num===""){
-            item.increase_num = 0;
-        }
-        if (isNaN(item.decrease_num) || item.decrease_num===""){
-            item.decrease_num = 0;
-        }
-        if (!isNaN(item.total_point)){
-            $scope.totalPoints -= item.total_point; 
-        }
-        item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
-        $scope.totalPoints += item.total_point;
-    };
-
-    var doPlus = function(val, step){
-        if (isNaN(val)){
-            val = 0;
-        }
-        val = Math.abs(val);
-        val = Math.floor(val);
-        val += step;
-        if (val < 0){
-            val = 0;
-        }
-        return val;
-    };
-
-    var
-    buildParam = function (url) {
-        var param = {
-            method: 'GET',
-            url: url,
-            params: $scope.search
-        };
-        return param;
-    },
-    loadData = function (url) {
-            // $http(buildParam(url))
-            //     .then(function (response) {
-            //         if (response.data.status === 200) {
-            //             $scope.data = response.data.data.list;
-            //         } else {
-            //             $.notify(response.data.message, 'danger');
-            //         }
-            //     }, function (x) {
-            //         $.notify('服务器出了点问题，我们正在处理', 'danger');
-            //     });
-        };
-
-        
-
-        $scope.submit = function(){
+        $scope.submit = function () {
 
             var dataPost = {};
 
@@ -708,17 +661,17 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
 
             //每个条目不同的部分
             //对于每个大项
-            $scope.data.forEach(function(data_i, index){
+            $scope.data.forEach(function (data_i, index) {
                 var hasValue = false;
                 //对于每个小条目
-                data_i.items.forEach(function(item, index){
+                data_i.items.forEach(function (item, index) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point!==""){
+                    if (!isNaN(item.total_point) && item.total_point !== "") {
                         //***需要服务端提供***
                         var father_id = 0;
-                        
+
                         //如果大项还没加入过，先提交大项条目，获取father_id
-                        if (!hasValue){
+                        if (!hasValue) {
                             dataPost.index_name = data_i.index_name;
                             dataPost.level = data_i.level;
                             // $http.post('/url', dataPost).then(function (response) {
@@ -749,32 +702,32 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
                         dataPost.total_point = item.total_point;
                         dataPost.level = item.level;
                         dataPost.father_id = father_id;
-                        
-                        // $http.post('/url', dataPost).then(function (response) {
-                            //     if (response.data.status === 200) {
-                            //         
-                            //     } else {
-                            //         $.notify(response.data.message, 'danger');
-                            //           break;
-                            //     }
-                            // }, function (x) {
-                            //     $.notify('服务器出了点问题，我们正在处理', 'danger');
-                            //     break;
-                            // });
-                            alert(dataPost.total_point + dataPost.submit_time);
-                        }
 
-                    });
+                        // $http.post('/url', dataPost).then(function (response) {
+                        //     if (response.data.status === 200) {
+                        //
+                        //     } else {
+                        //         $.notify(response.data.message, 'danger');
+                        //           break;
+                        //     }
+                        // }, function (x) {
+                        //     $.notify('服务器出了点问题，我们正在处理', 'danger');
+                        //     break;
+                        // });
+                        alert(dataPost.total_point + dataPost.submit_time);
+                    }
+
+                });
             });
-            if (postFlag){
+            if (postFlag) {
                 $state.go('app.result');
             }
-            else{
+            else {
                 $.notify('填写内容为空', 'danger');
             }
         };
 
-        $scope.reset = function(item){
+        $scope.reset = function (item) {
             $scope.totalPoints -= item.total_point;
             item.increase_num = "";
             item.increase_detail = "";
@@ -782,11 +735,11 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
             item.decrease_detail = "";
             item.total_point = "";
         };
-        $scope.resetAll = function(){
-            $scope.data.forEach(function(data_i, index){
-                data_i.items.forEach(function(item){
+        $scope.resetAll = function () {
+            $scope.data.forEach(function (data_i, index) {
+                data_i.items.forEach(function (item) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point!==""){
+                    if (!isNaN(item.total_point) && item.total_point !== "") {
                         $scope.reset(item);
                     }
                 });
@@ -794,7 +747,7 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
         };
 
         //把日期格式2018/04/20替换为2018-04-20
-        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g,'-');
+        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g, '-');
         //页面载入时日历是否自动打开
         $scope.opened = {
             start: false,
@@ -818,67 +771,39 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
             d.height($(window).height() - d.offset().top);
         });
         $(window).resize();
-
+        loadRelations();
     }]);
 
 /**=========================================================
  * Module: GraphController.js
  =========================================================*/
 
- App.controller('GraphController', ['$scope', '$http', '$rootScope',
+App.controller('GraphController', ['$scope', '$http', '$rootScope',
     function ($scope, $http, $rootScope) {
         var chartData = {
             labels: [],
             datasets: [
-            {
-                label: "My First dataset",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                pointHighlightFill: "#fff",
-                pointHighlightStroke: "rgba(151,187,205,1)",
-                data: []
-            },
+                {
+                    label: "My First dataset",
+                    fillColor: "rgba(151,187,205,0.2)",
+                    strokeColor: "rgba(151,187,205,1)",
+                    pointColor: "rgba(151,187,205,1)",
+                    pointStrokeColor: "#fff",
+                    pointHighlightFill: "#fff",
+                    pointHighlightStroke: "rgba(151,187,205,1)",
+                    data: []
+                },
             ]
         };
-
-        //***需要替换为从后台获取的数据***
-        $scope.data = [
-        {
-            standard_date : "2018-04-24",
-            total_point: 60,
-        },
-        {           
-            standard_date : "2018-04-25",
-            total_point: 100,
-        },
-        {
-            standard_date : "2018-04-26",
-            total_point: 80,
-        },
-        {           
-            standard_date : "2018-04-27",
-            total_point: 100,
-        },
-        {           
-            standard_date : "2018-04-28",
-            total_point: 70,
-        },
-        {           
-            standard_date : "2018-04-29",
-            total_point: 90,
-        },
-        ];
-
-        $scope.data.forEach(function(data_i, index){
-            chartData.labels.push(data_i.standard_date);
-            chartData.datasets[0].data.push(data_i.total_point);
-        });
-
+        $scope.search = {
+            personId: $rootScope.account.id,
+            departmentId: 0,
+            timeStart: '',
+            timeEnd: '',
+        };
         var chartOptions = {
             // ///Boolean - Whether grid lines are shown across the chart
-            scaleShowGridLines : true,
+            scaleShowGridLines: true,
 
             // //String - Colour of the grid lines
             // scaleGridLineColor : "rgba(0,0,0,.05)",
@@ -925,23 +850,115 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
         };
         // Get context with jQuery - using jQuery's .get() method.
         var ctx = $("#myChart").get(0).getContext("2d");
-            // This will get the first returned node in the jQuery collection.
-            var myNewChart = new Chart(ctx);
-            myNewChart.Line(chartData, chartOptions);
+        // This will get the first returned node in the jQuery collection.
+        var myNewChart = new Chart(ctx);
 
+        myNewChart.Line(chartData, chartOptions);
+        var
+            buildParam = function () {
+                var param = {
+                    method: 'GET',
+                    url: $rootScope.url + '/standard-service/statics/search',
+                    params: $scope.search
+                };
+                return param;
+            }, loadData = function () {
+                $http(buildParam())
+                    .then(function (response) {
+                        if (response.data.status === 200) {
+                            $scope.data = response.data.data;
+                            $scope.data.forEach(function (data_i, index) {
+                                chartData.labels.push(data_i.recordDate);
+                                chartData.datasets[0].data.push(data_i.score);
+                            });
+                        } else {
+                            $.notify(response.data.message, 'danger');
+                        }
+                    }, function (x) {
+                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                    });
+            },            resetList = function () {
+                if (!!$scope.timeStart) {
+                    var date = new Date($scope.timeStart);
+                    $scope.search.timeStart = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
+                }
+
+                if (!!$scope.timeEnd) {
+                    var date = new Date($scope.timeEnd);
+                    $scope.search.timeEnd = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59';
+                }
+
+                loadData();
+            }, loadRelations = function () {
+                $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
+                    .then(function (response) {
+                        if (response.data.status === 200) {
+                            $scope.relations = response.data.data;
+                            $scope.department = $scope.relations[0];
+                            loadIndex();
+                        } else {
+                            $.notify(response.data.message, 'danger');
+                        }
+                    }, function (x) {
+                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                    });
+            };
+        $scope.searchList = resetList;
+        $scope.resetSearch = function () {
+            $scope.search.departmentId = 0;
+            $scope.search.timeStart = '';
+            $scope.search.timeEnd = '';
             $scope.timeStart = '';
             $scope.timeEnd = '';
-            $scope.opened = {
-                start: false,
-                end: false
-            };
-            $scope.open = function ($event, attr) {
-                $event.preventDefault();
-                $event.stopPropagation();
+            resetList();
+        };
+        //***需要替换为从后台获取的数据***
+        /* $scope.data = [
+             {
+                 standard_date: "2018-04-24",
+                 total_point: 60,
+             },
+             {
+                 standard_date: "2018-04-25",
+                 total_point: 100,
+             },
+             {
+                 standard_date: "2018-04-26",
+                 total_point: 80,
+             },
+             {
+                 standard_date: "2018-04-27",
+                 total_point: 100,
+             },
+             {
+                 standard_date: "2018-04-28",
+                 total_point: 70,
+             },
+             {
+                 standard_date: "2018-04-29",
+                 total_point: 90,
+             },
+         ];*/
 
-                $scope.opened[attr] = true;
-            };
-        }]);
+
+
+        $scope.timeStart = '';
+        $scope.timeEnd = '';
+        $scope.opened = {
+            start: false,
+            end: false
+        };
+
+        $scope.open = function ($event, attr) {
+            $event.preventDefault();
+            $event.stopPropagation();
+
+            $scope.opened[attr] = true;
+        };
+
+        resetList();
+        loadRelations();
+    }]);
 
 /**=========================================================
  * Module: main.js
@@ -1040,196 +1057,6 @@ App.controller('AppController',
                 $state.go('login');
             }
         }]);
-/*global Qiniu */
-/*global plupload */
-/*global FileProgress */
-/*global hljs */
-
-App.controller('QiniuFileUploadController', ['$scope', '$rootScope', '$timeout', '$http', function ($scope, $rootScope, $timeout, $http) {
-
-    var qiniuuploader, token = '';
-    var key = '';
-    $rootScope.filename = '';
-    $rootScope.filesize = '';
-    $scope.media = {
-        name: '',
-        note: '',
-        second: 10,
-        minute: 0
-    };
-    $scope.uploadqueue = '';
-    parseJSON = function (data) {
-        // Attempt to parse using the native JSON parser first
-        if (window.JSON && window.JSON.parse) {
-            return window.JSON.parse(data);
-        }
-
-        if (data === null) {
-            return data;
-        }
-        if (typeof data === "string") {
-
-            // Make sure leading/trailing whitespace is removed (IE can't handle it)
-            data = this.trim(data);
-
-            if (data) {
-                // Make sure the incoming data is actual JSON
-                // Logic borrowed from http://json.org/json2.js
-                if (/^[\],:{}\s]*$/.test(data.replace(/\\(?:["\\\/bfnrt]|u[\da-fA-F]{4})/g, "@").replace(/"[^"\\\r\n]*"|true|false|null|-?(?:\d+\.|)\d+(?:[eE][+-]?\d+|)/g, "]").replace(/(?:^|:|,)(?:\s*\[)+/g, ""))) {
-
-                    return (function () {
-                        return data;
-                    })();
-                }
-            }
-        }
-    };
-    $timeout(function () {
-        qiniuuploader = Qiniu.uploader({
-            runtimes: 'html5,flash,html4',
-            browse_button: 'pickfiles',
-            container: 'qiniuContainer',
-            max_file_size: '600mb',
-            flash_swf_url: 'js/plupload/Moxie.swf',
-            chunk_size: '4mb',
-            domain: 'http://7xlx4k.com2.z0.glb.qiniucdn.com/',
-            get_new_uptoken: true,
-            uptoken: function () {
-                return token;
-            },
-            key: function () {
-                return key;
-            },
-            auto_start: false,
-
-            init: {
-                'FilesAdded': function (up, files) {
-                    $('table').show();
-                    $('#success').hide();
-                    plupload.each(files, function (file) {
-                        $scope.$apply(function () {
-                                $rootScope.filename = file.name;
-                                $rootScope.filesize = '(' + (file.size / 1024 / 1024).toFixed(2) + 'MB)';
-                            }
-                        );
-                    });
-                },
-                'BeforeUpload': function (up, file) {
-                    var chunk_size = plupload.parseSize(this.getOption('chunk_size'))
-                },
-                'UploadProgress': function (up, file) {
-                    console.log("percent:" + file.percent);
-                    $('body').append('<style>.whirl:after{content: "' + file.percent + '%";}</style>');
-                    //console.log("pro:"+);
-                },
-                'UploadComplete': function () {
-                    //$('#success').show();
-                },
-                'FileUploaded': function (up, file, JSONString) {
-                    $rootScope.filename = '';
-                    $rootScope.filesize = '';
-                    var info = parseJSON(JSONString);
-                    if (!info.ext) {
-                        alert("文件上传服务器失败！请重试！");
-                        $scope.closeThisDialog();
-                    }
-                    var showtime = parseInt($scope.media.minute) * 60 + parseInt($scope.media.second);
-                    var filesize = 0;
-                    var newname = info.key + info.ext;
-                    var rotate = "";
-                    if ($scope.media.type === 'V' || $scope.media.type === 'F') {
-                        showtime = parseInt(info.avinfo.format.duration) + 1;
-                        filesize = parseInt(info.avinfo.format.size);
-                        newname = info.key + "-s.mp4";
-                    } else {
-                        if (!(info.exif==null||info.exif==undefined )) {
-                            rotate = info.exif.Orientation.val;
-                        }
-                    }
-                    $http
-                        .post('/merchant/uploadimagecontinue.action?oldkey=' +
-                            info.key +
-                            '&newkey=' + newname +
-                            '&shotkey=' + $scope.rename +
-                            '&name=' + $scope.media.name +
-                            '&type=' + $scope.media.type +
-                            '&note=' + $scope.media.note +
-                            '&showtime=' + showtime +
-                            '&filesize=' + filesize + "&rotate=" + rotate
-                        )
-                        .then(
-                            function (response) {
-                                if (response.data.status) {
-                                    if ($scope.media.type === 'A') {
-                                        $rootScope.foregrounds = response.data.data;
-                                    } else if ($scope.media.type === 'B') {
-                                        $rootScope.backgrounds = response.data.data;
-                                    } else if ($scope.media.type === 'V') {
-                                        $rootScope.videos = response.data.data;
-                                        $.notify('视频已上传，正在转码中，请等待几分钟后再关联到盒子！', 'success');
-                                    }
-                                    else if ($scope.media.type === 'F') {
-                                        $rootScope.fvideos = response.data.data;
-                                        $.notify('视频已上传，正在转码中，请等待几分钟后再关联到盒子！', 'success');
-                                    }
-                                } else {
-                                    $
-                                        .notify(
-                                            response.data.msg,
-                                            'danger');
-                                }
-                            },
-                            function (x) {
-                                $.notify('服务器出了点问题，我们正在处理',
-                                    'danger');
-                            });
-                    $scope.closeThisDialog();
-                },
-                'Error': function (up, err, errTip) {
-                    console.log("Error:" + err);
-                }
-            }
-        });
-    }, 200);
-    $scope.save = function () {
-        if ($scope.media.name == '') {
-            $.notify('必须输入名称', {status: 'danger', pos: 'top-right'});
-            return;
-        }
-        if (parseInt($scope.media.minute) != $scope.media.minute
-            || parseInt($scope.media.second) != $scope.media.second) {
-            $.notify('播放时长必须是整数', {status: 'danger', pos: 'top-right'});
-            return;
-        }
-        if ($scope.media.minute < 0 || $scope.media.second < 0 || $scope.media.second + $scope.media.minute == 0) {
-            $.notify('播放时长必须是正数', {status: 'danger', pos: 'top-right'});
-            return;
-        }
-        $scope.media.type = $scope.ngDialogData;
-        $http
-            .get('/merchant/uploadprepare.action?key=' + $scope.media.name + '&type=' + $scope.media.type)
-            .then(
-                function (response) {
-                    if (response.data.status) {
-                        token = response.data.data.token;
-                        key = response.data.data.key;
-                        $scope.rename = response.data.data.rename;
-                        $scope.isUploading = 'whirl shadow';
-                        qiniuuploader.start();
-
-                    } else {
-                        $
-                            .notify(
-                                response.data.msg,
-                                'danger');
-                    }
-                },
-                function (x) {
-                    $.notify('服务器出了点问题，我们正在处理',
-                        'danger');
-                });
-    };
-}]);
 /**=========================================================
  * Module: ResultController.js
  =========================================================*/
@@ -1420,7 +1247,7 @@ App.controller('SearchController', ['$scope', '$http', '$rootScope',
             buildParam = function () {
                 var param = {
                     method: 'GET',
-                    url: '/apis/remove-me/standard-service/result/search',
+                    url:$rootScope.url+'/standard-service/result/search',
                     params: $scope.search
                 };
                 return param;
@@ -1600,348 +1427,6 @@ App.controller('SidebarController', ['$rootScope', '$scope', '$state', '$http', 
             $state.go('login');
         }
     }]);
-/**=========================================================
- * Module: social-items.js
- =========================================================*/
-
-App.controller('SocialCtrl', ['$scope', '$http', '$rootScope',
-        function ($scope, $http, $rootScope) {
-            $scope.search = {
-                nickname: '',
-                content: '',
-                wechat: '',
-                dianping: '',
-                dt: ''
-            };
-
-            function buildParam() {
-                var param = '&nickname=';
-                param += $scope.search.nickname;
-                param += '&content=';
-                param += $scope.search.content;
-                param += '&source=';
-                if ($scope.search.wechat) {
-                    param += 'wechat';
-                    if ($scope.search.dianping) param += ',dazhongdianping';
-                } else if ($scope.search.dianping)
-                    param += 'dazhongdianping';
-                if ($scope.search.dt) {
-                    var d = moment($scope.search.dt).format('YYYY-MM-DD');
-                    param += '&begintime=' + d + '&endtime=' + d;
-                } else {
-                    param += '&begintime=';
-                    param += '&endtime=';
-                }
-                return param;
-            }
-
-            function loadData() {
-                var type = $scope.search.type || 2;
-                var page = $scope.search.page;
-                var param = 'showtype=' + type + '&page=' + page + buildParam();
-                var map = {1: 'unapproved', 2: 'approved', 3: 'favorite', 4: 'deleted'};
-                var target = map[type];
-                $http
-                    .get('/merchant/search.action?' + param)
-                    .then(function (response) {
-                        if (response.data.status) {
-                            $scope[target] = response.data.data;
-                            var pagination = response.data.msg.split(',');
-                            $scope.totalItems = parseInt(pagination[1]);
-                        } else {
-                            $.notify(response.data.msg, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
-            }
-
-            $scope.pageChanged = loadData;
-
-            $scope.load = function (type) {
-                $scope.search.type = type;
-                $scope.search.page = 1;
-                loadData();
-                $('.comment:checked').prop('checked', false);
-            };
-
-            $scope.doSearch = function () {
-                $scope.search.page = 1;
-                loadData();
-            };
-
-            $scope.$watch('search.dt', function () {
-                $scope.doSearch();
-            });
-
-            $scope.addToBlackList = function (item) {
-                bootbox.confirm('确定要将该用户加入黑名单吗？', function (result) {
-                    if (!result) return;
-                    $http
-                        .post('/merchant/addblacklist.action?source=' + item.source
-                            + '&nickname=' + item.nickname + '&headportrait=' + item.headsculpture
-                            + '&userid=' + item.customerid)
-                        .then(function (response) {
-                            if (response.data.status) {
-                                $.notify('成功', 'success');
-                                $scope.doSearch();
-                            } else {
-                                $.notify(response.data.msg, 'danger');
-                            }
-                        }, function (x) {
-                            $.notify('服务器出了点问题，我们正在处理', 'danger');
-                        });
-                })
-            };
-
-            $scope.open = function ($event) {
-                $event.preventDefault();
-                $event.stopPropagation();
-
-                $scope.opened = true;
-            };
-
-            $scope.dateOptions = {
-                formatYear: 'yyyy',
-                startingDay: 1,
-                formatDayTitle: 'yyyy年M月'
-            };
-
-            $scope.format = 'yyyy年M月d日';
-
-            $scope.do = function (op, id) {
-                $http
-                    .get('/merchant/operateusercomment.action?optype=' + op + '&id=' + id)
-                    .then(function (response) {
-                        if (response.data.status) {
-                            loadData();
-                            $.notify('成功', 'success');
-                        } else {
-                            $.notify(response.data.msg, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
-            };
-
-            $scope.doAll = function (op) {
-                var list = [];
-                $('.comment:checked').each(function (_, item) {
-                    list.push(item.value);
-                });
-                var param = list.join(',');
-                $http
-                    .get('/merchant/operateusercomment.action?optype=' + op + '&id=' + param)
-                    .then(function (response) {
-                        if (response.data.status) {
-                            loadData();
-                            $.notify('成功', 'success');
-                        } else {
-                            $.notify(response.data.msg, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
-            };
-
-            $scope.show = function (item) {
-                $http
-                    .get('/merchant/getcommentpic.action?id=' + item.commentid)
-                    .then(function (response) {
-                        if (response.data.status) {
-                            var src2 = response.data.data;
-                            bootbox
-                                .dialog({
-                                    title: '原图',
-                                    message: '<div><img width="95%" src="' + src2 + '" />' + '</div>'
-                                });
-                        } else {
-                            $.notify(response.data.msg, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
-            }
-
-            $scope.print = function (item) {
-                if (item.picture) {
-                    $http
-                        .get('/merchant/account.action')
-                        .then(function (response) {
-                            if (response.data.status) {
-                                var logo = '/upload/file/business_logo/' + response.data.data.logopath;
-                                var table = $('<table width="100%">');
-                                var img = '<img width="100%" src="//' + $rootScope.url + '/weipage/file/' + item.picture + '">';
-                                table.append('<tr><td colspan="2">' + img + '</td></tr>');
-                                var content = '<tr><td width="20%"><img src="//' + $rootScope.url + logo + '"</td>' +
-                                    '<td width="80%">' + item.content + '</td></tr>';
-                                table.append(content);
-                                table.prepend('<style>@page{size:3.5in 5in; margin: 25mm 25mm 25mm 25mm;}</style>')
-                                table.printArea();
-                            } else {
-                                $.notify(response.data.msg, 'danger');
-                            }
-                        }, function (x) {
-                            $.notify('服务器出了点问题，我们正在处理', 'danger');
-                        });
-                } else {
-                    $.notify('该条目没有照片哦', 'danger');
-                }
-            };
-
-            $(window).resize(function () {
-                var d = $('#container');
-                d.height($(window).height() - d.offset().top );
-            });
-            $(window).resize();
-        }])
-    .filter('moment', function () {
-        return function (val) {
-            return moment(val).format('YYYY年M月D日 H:mm');
-        };
-    })
-;
-
-/**=========================================================
- * Module: upload.js
- =========================================================*/
-
-App.controller('FileUploadController', ['$scope', '$rootScope', 'FileUploader', '$http', function ($scope, $rootScope, FileUploader, $http) {
-
-    var uploader = $scope.uploader = new FileUploader({
-        //url: '/merchant/addmediaResouce.action',
-        url: 'http://upload.qiniu.com/',
-        queueLimit: 1
-    });
-
-    $scope.clear = function () {
-        uploader.clearQueue();
-    };
-
-    $scope.imgLoaded = function (img) {
-        if (img.width > img.height) {
-            $scope.direction = 0;
-        } else {
-            $scope.direction = 1;
-        }
-        if (!(img.width == 1920 && img.height == 1080)
-            && !(img.height == 1920 && img.width == 1080)) {
-            $.notify('图片的尺寸不是1920×1080或1080×1920,无法达到最佳效果', {'status': 'danger', pos: 'top-right'});
-        }
-    };
-
-    $scope.media = {
-        name: '',
-        note: '',
-        second: 10,
-        minute: 0
-    };
-
-    uploader.onBeforeUploadItem = function (item) {
-        item.formData.push({
-            token: $scope.token,
-            key: $scope.key,
-            accept: "text/plain; charset=utf-8"
-        });
-    };
-
-    uploader.onCompleteItem = function (fileItem, qiniuresponse, status, headers) {
-        if (status != 200) {
-
-            $.notify("文件上传服务器失败，请重试！错误代码："+status, {'status': 'danger', pos: 'top-right'});
-            $scope.closeThisDialog();
-        }
-
-        var showtime = parseInt($scope.media.minute) * 60 + parseInt($scope.media.second);
-        var filesize = 0;
-        var newname=qiniuresponse.key + qiniuresponse.ext;
-        if ($scope.media.type === 'V' || $scope.media.type === 'F') {
-            showtime = parseInt(qiniuresponse.avinfo.format.duration) + 1;
-            filesize = parseInt(qiniuresponse.avinfo.format.size);
-            newname=qiniuresponse.key + ".mp4";
-        }
-        $http
-            .post('/merchant/uploadimagecontinue.action?oldkey=' +
-                qiniuresponse.key +
-                '&newkey=' + newname+
-                '&shotkey=' + $scope.rename +
-                '&name=' + $scope.media.name +
-                '&type=' + $scope.media.type +
-                '&note=' + $scope.media.note +
-                '&showtime=' + showtime +
-                '&filesize=' + filesize
-            )
-            .then(
-            function (response) {
-                if (response.data.status) {
-                    if ($scope.media.type === 'A') {
-                        $rootScope.foregrounds = response.data.data;
-                    } else if ($scope.media.type === 'B') {
-                        $rootScope.backgrounds = response.data.data;
-                    } else if ($scope.media.type === 'V') {
-                        $rootScope.videos = response.data.data;
-
-                    }
-                    else if ($scope.media.type === 'F') {
-                        $rootScope.fvideos = response.data.data;
-                    }
-                } else {
-                    $
-                        .notify(
-                            response.data.msg,
-                            'danger');
-                }
-            },
-            function (x) {
-                $.notify('服务器出了点问题，我们正在处理',
-                    'danger');
-            });
-        $scope.isUploading = '';
-        $scope.closeThisDialog();
-    };
-
-    uploader.onProgressItem = function (fileItem, progress) {
-        $('body').append('<style>.whirl:after{content: "' + progress + '%";}</style>');
-    };
-
-    $scope.save = function () {
-        if ($scope.media.name == '') {
-            $.notify('必须输入名称', {status: 'danger', pos: 'top-right'});
-            return;
-        }
-        if (parseInt($scope.media.minute) != $scope.media.minute
-            || parseInt($scope.media.second) != $scope.media.second) {
-            $.notify('播放时长必须是整数', {status: 'danger', pos: 'top-right'});
-            return;
-        }
-        if ($scope.media.minute < 0 || $scope.media.second < 0 || $scope.media.second + $scope.media.minute == 0) {
-            $.notify('播放时长必须是正数', {status: 'danger', pos: 'top-right'});
-            return;
-        }
-        $scope.media.type = $scope.ngDialogData;
-        $http
-            .get('/merchant/uploadprepare.action?key=' + $scope.media.name + '&type=' + $scope.media.type)
-            .then(
-            function (response) {
-                if (response.data.status) {
-                    $scope.token = response.data.data.token;
-                    $scope.key = response.data.data.key;
-                    $scope.rename = response.data.data.rename;
-                    $scope.isUploading = 'whirl shadow';
-                    uploader.uploadAll();
-                } else {
-                    $
-                        .notify(
-                            response.data.msg,
-                            'danger');
-                }
-            },
-            function (x) {
-                $.notify('服务器出了点问题，我们正在处理',
-                    'danger');
-            });
-    };
-}]);
 /**=========================================================
  * Module: anchor.js
  * Disables null anchor behavior

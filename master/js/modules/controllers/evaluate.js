@@ -2,36 +2,31 @@
  * Module: EvaluateController.js
  =========================================================*/
 
- App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state', 
+App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
     function ($scope, $http, $rootScope, $state) {
-
-       var loadRelations = function () {
-           $http.get('/apis/remove-me/account-service/relations/list?personId='+$rootScope.account.id)
-               .then(function (response) {
-                   if (response.data.status === 200) {
-                       $scope.relations = response.data.data;
-                       $scope.department= $scope.relations[0];
-                       loadIndex();
-                       console.log("get user departments:"+JSON.stringify($scope.relations))
-                   } else {
-                       $.notify(response.data.message, 'danger');
-                   }
-               }, function (x) {
-                   $.notify('服务器出了点问题，我们正在处理', 'danger');
-               });
-       }
+        var loadRelations = function () {
+            $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
+                .then(function (response) {
+                    if (response.data.status === 200) {
+                        $scope.relations = response.data.data;
+                        $scope.department = $scope.relations[0];
+                        loadIndex();
+                    } else {
+                        $.notify(response.data.message, 'danger');
+                    }
+                }, function (x) {
+                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                });
+        }
         var loadIndex = function () {
 
-            $http.get('/apis/remove-me/standard-service/detail/list?departmentId='+$scope.department.id+'&level=0')
+            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
                 .then(function (response) {
                     if (response.data.status === 200) {
                         $scope.data = response.data.data;
-                        console.log("data.size:"+$scope.data.length)
                         $scope.data.forEach(function (item) {
-                            console.log("item:"+item.indexName);
-                            $http.get('/apis/remove-me/standard-service/detail/list?fatherId='+item.id+'&level=1')
+                            $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
                                 .then(function (response) {
-                                    console.log("get response:"+item.indexName);
                                     if (response.data.status === 200) {
                                         item['items'] = response.data.data;
                                     } else {
@@ -49,143 +44,142 @@
                 });
         }
 
-        $scope.changeDepartment =loadIndex;
+        $scope.changeDepartment = loadIndex;
 
         //***需要替换为从后台获取的数据***
-   /*     $scope.data = [
-        {
-            id : "0",
-            level : "0",
-            index_name : "政治工作",
-            items :
-            [
-            {
-                id : "1",
-                department_id : "1",
-                index_name: "学习",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                level : "1",
-                father_id : "0",
-            },
-            {
-                id : "2",
-                department_id : "1",
-                index_name: "党务",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                level : "1",
-                father_id : "0",
+        /*     $scope.data = [
+             {
+                 id : "0",
+                 level : "0",
+                 index_name : "政治工作",
+                 items :
+                 [
+                 {
+                     id : "1",
+                     department_id : "1",
+                     index_name: "学习",
+                     increase_name : "好好学习",
+                     increase_point : 2,
+                     increase_unit: "次",
+                     decrease_name : "没出操",
+                     decrease_point : 1,
+                     decrease_unit: "次",
+                     level : "1",
+                     father_id : "0",
+                 },
+                 {
+                     id : "2",
+                     department_id : "1",
+                     index_name: "党务",
+                     increase_name : "好好学习",
+                     increase_point : 2,
+                     increase_unit: "次",
+                     decrease_name : "没出操",
+                     decrease_point : 1,
+                     decrease_unit: "次",
+                     level : "1",
+                     father_id : "0",
+                 }
+                 ]
+
+             },
+             {
+                 id : "3",
+                 level : "0",
+                 index_name : "训练工作",
+                 items :
+                 [
+                 {
+                     id : "4",
+                     department_id : "1",
+                     index_name: "党务",
+                     increase_name : "好好学习",
+                     increase_point : 2,
+                     increase_unit: "次",
+                     decrease_name : "没出操",
+                     decrease_point : 1,
+                     decrease_unit: "次",
+                     level : "1",
+                     father_id : "3",
+                 },
+                 {
+                    id : "5",
+                    department_id : "1",
+                    index_name: "党务",
+                    increase_name : "好好学习",
+                    increase_point : 2,
+                    increase_unit: "次",
+                    decrease_name : "没出操",
+                    decrease_point : 1,
+                    decrease_unit: "次",
+                    level : "1",
+                    father_id : "3",
+                }
+                ]
             }
-            ]
+            ];*/
 
-        },
-        {
-            id : "3",
-            level : "0",
-            index_name : "训练工作",
-            items :
-            [
-            {
-                id : "4",
-                department_id : "1",
-                index_name: "党务",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                level : "1",
-                father_id : "3",
+        $scope.totalPoints = 0;
+
+        $scope.operate = function (item, index, step) {
+            if (index === 0) {
+                var val = item.increase_num;
+                item.increase_num = doPlus(val, step);
+            }
+            else if (index === 1) {
+                var val = item.decrease_num;
+                item.decrease_num = doPlus(val, step);
+            }
+            if (isNaN(item.increase_num) || item.increase_num === "") {
+                item.increase_num = 0;
+            }
+            if (isNaN(item.decrease_num) || item.decrease_num === "") {
+                item.decrease_num = 0;
+            }
+            if (!isNaN(item.total_point)) {
+                $scope.totalPoints -= item.total_point;
+            }
+            item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
+            $scope.totalPoints += item.total_point;
+        };
+
+        var doPlus = function (val, step) {
+            if (isNaN(val)) {
+                val = 0;
+            }
+            val = Math.abs(val);
+            val = Math.floor(val);
+            val += step;
+            if (val < 0) {
+                val = 0;
+            }
+            return val;
+        };
+
+        var
+            buildParam = function (url) {
+                var param = {
+                    method: 'GET',
+                    url: url,
+                    params: $scope.search
+                };
+                return param;
             },
-            {
-               id : "5",
-               department_id : "1",
-               index_name: "党务",
-               increase_name : "好好学习",
-               increase_point : 2,
-               increase_unit: "次",
-               decrease_name : "没出操",
-               decrease_point : 1,
-               decrease_unit: "次",
-               level : "1",
-               father_id : "3",
-           }
-           ]
-       }
-       ];*/
+            loadData = function (url) {
+                // $http(buildParam(url))
+                //     .then(function (response) {
+                //         if (response.data.status === 200) {
+                //             $scope.data = response.data.data.list;
+                //         } else {
+                //             $.notify(response.data.message, 'danger');
+                //         }
+                //     }, function (x) {
+                //         $.notify('服务器出了点问题，我们正在处理', 'danger');
+                //     });
+            };
 
-    $scope.totalPoints = 0;
 
-    $scope.operate = function(item, index, step){
-        if (index === 0){
-            var val = item.increase_num;
-            item.increase_num = doPlus(val, step);
-        }
-        else if (index === 1){
-            var val = item.decrease_num;
-            item.decrease_num = doPlus(val, step);
-        }
-        if (isNaN(item.increase_num) || item.increase_num===""){
-            item.increase_num = 0;
-        }
-        if (isNaN(item.decrease_num) || item.decrease_num===""){
-            item.decrease_num = 0;
-        }
-        if (!isNaN(item.total_point)){
-            $scope.totalPoints -= item.total_point; 
-        }
-        item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
-        $scope.totalPoints += item.total_point;
-    };
-
-    var doPlus = function(val, step){
-        if (isNaN(val)){
-            val = 0;
-        }
-        val = Math.abs(val);
-        val = Math.floor(val);
-        val += step;
-        if (val < 0){
-            val = 0;
-        }
-        return val;
-    };
-
-    var
-    buildParam = function (url) {
-        var param = {
-            method: 'GET',
-            url: url,
-            params: $scope.search
-        };
-        return param;
-    },
-    loadData = function (url) {
-            // $http(buildParam(url))
-            //     .then(function (response) {
-            //         if (response.data.status === 200) {
-            //             $scope.data = response.data.data.list;
-            //         } else {
-            //             $.notify(response.data.message, 'danger');
-            //         }
-            //     }, function (x) {
-            //         $.notify('服务器出了点问题，我们正在处理', 'danger');
-            //     });
-        };
-
-        
-
-        $scope.submit = function(){
+        $scope.submit = function () {
 
             var dataPost = {};
 
@@ -202,17 +196,17 @@
 
             //每个条目不同的部分
             //对于每个大项
-            $scope.data.forEach(function(data_i, index){
+            $scope.data.forEach(function (data_i, index) {
                 var hasValue = false;
                 //对于每个小条目
-                data_i.items.forEach(function(item, index){
+                data_i.items.forEach(function (item, index) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point!==""){
+                    if (!isNaN(item.total_point) && item.total_point !== "") {
                         //***需要服务端提供***
                         var father_id = 0;
-                        
+
                         //如果大项还没加入过，先提交大项条目，获取father_id
-                        if (!hasValue){
+                        if (!hasValue) {
                             dataPost.index_name = data_i.index_name;
                             dataPost.level = data_i.level;
                             // $http.post('/url', dataPost).then(function (response) {
@@ -243,32 +237,32 @@
                         dataPost.total_point = item.total_point;
                         dataPost.level = item.level;
                         dataPost.father_id = father_id;
-                        
-                        // $http.post('/url', dataPost).then(function (response) {
-                            //     if (response.data.status === 200) {
-                            //         
-                            //     } else {
-                            //         $.notify(response.data.message, 'danger');
-                            //           break;
-                            //     }
-                            // }, function (x) {
-                            //     $.notify('服务器出了点问题，我们正在处理', 'danger');
-                            //     break;
-                            // });
-                            alert(dataPost.total_point + dataPost.submit_time);
-                        }
 
-                    });
+                        // $http.post('/url', dataPost).then(function (response) {
+                        //     if (response.data.status === 200) {
+                        //
+                        //     } else {
+                        //         $.notify(response.data.message, 'danger');
+                        //           break;
+                        //     }
+                        // }, function (x) {
+                        //     $.notify('服务器出了点问题，我们正在处理', 'danger');
+                        //     break;
+                        // });
+                        alert(dataPost.total_point + dataPost.submit_time);
+                    }
+
+                });
             });
-            if (postFlag){
+            if (postFlag) {
                 $state.go('app.result');
             }
-            else{
+            else {
                 $.notify('填写内容为空', 'danger');
             }
         };
 
-        $scope.reset = function(item){
+        $scope.reset = function (item) {
             $scope.totalPoints -= item.total_point;
             item.increase_num = "";
             item.increase_detail = "";
@@ -276,11 +270,11 @@
             item.decrease_detail = "";
             item.total_point = "";
         };
-        $scope.resetAll = function(){
-            $scope.data.forEach(function(data_i, index){
-                data_i.items.forEach(function(item){
+        $scope.resetAll = function () {
+            $scope.data.forEach(function (data_i, index) {
+                data_i.items.forEach(function (item) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point!==""){
+                    if (!isNaN(item.total_point) && item.total_point !== "") {
                         $scope.reset(item);
                     }
                 });
@@ -288,7 +282,7 @@
         };
 
         //把日期格式2018/04/20替换为2018-04-20
-        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g,'-');
+        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g, '-');
         //页面载入时日历是否自动打开
         $scope.opened = {
             start: false,

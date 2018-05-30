@@ -12,13 +12,13 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
         //$state.go('app.evaluate');
 
         $http
-            .post('/apis/remove-me/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
+            .post($rootScope.url+'/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
             .then(function (response) {
                 if (response.data.status != 200) {
                     $scope.authMsg = response.data.message;
                 } else {
                     $rootScope.account = response.data.data;
-                    $state.go('app.account');
+                    $state.go('app.evaluate');
                 }
                 ;
             }, function (x) {
