@@ -13,12 +13,13 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
         $rootScope.$stateParams = $stateParams;
         $rootScope.$storage = $window.localStorage;
 
-
-        if (window.location.href.indexOf('indexing') > 0) {
+        $rootScope.url = 'http://59.110.125.195:8088/standard-0.0.1-SNAPSHOT/remove-me';
+       /* if (window.location.href.indexOf('indexing') > 0) {
             $rootScope.url = 'www.standard.com';
         } else {
             $rootScope.url = '/apis/remove-me';
-        }
+
+        }*/
 
         // Uncomment this to disable template cache
         /*$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
