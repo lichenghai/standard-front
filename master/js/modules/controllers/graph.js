@@ -91,9 +91,14 @@ App.controller('GraphController', ['$scope', '$http', '$rootScope',
                     .then(function (response) {
                         if (response.data.status === 200) {
                             $scope.data = response.data.data;
-                            $scope.data.forEach(function (data_i, index) {
-                                chartData.labels.push(data_i.recordDate);
+                            $scope.data.forEach(function (data_i, index,array) {
+                                chartData.labels.push(moment(data_i.recordDate).format('YYYY-MM-DD'));
                                 chartData.datasets[0].data.push(data_i.score);
+                                if(index==array.length-1){
+                                    console.log("chartData:"+JSON.stringify(chartData));
+                                    myNewChart.Line(chartData, chartOptions);
+
+                                }
                             });
                         } else {
                             $.notify(response.data.message, 'danger');
