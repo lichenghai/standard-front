@@ -42,6 +42,10 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
             .state('app.result', {
                 url: '/result',
                 title: '查看本人绩效',
+                params:{
+                    standardDate: '',
+                    departmentId: -1
+                },
                 templateUrl: helper.basepath('result.html'),
                 resolve: helper.resolveFor('ngDialog'),
                 controller: 'ResultController'
