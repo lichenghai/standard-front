@@ -13,12 +13,14 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
         $rootScope.$stateParams = $stateParams;
         $rootScope.$storage = $window.localStorage;
 
-
-        if (window.location.href.indexOf('indexing') > 0) {
+        //$rootScope.url = 'http://59.110.125.195:8088/standard-0.0.1-SNAPSHOT/remove-me';
+        $rootScope.url = '/apis/remove-me';
+       /* if (window.location.href.indexOf('indexing') > 0) {
             $rootScope.url = 'www.standard.com';
         } else {
             $rootScope.url = '/apis/remove-me';
-        }
+
+        }*/
 
         // Uncomment this to disable template cache
         /*$rootScope.$on('$stateChangeStart', function(event, toState, toParams, fromState, fromParams) {
@@ -50,137 +52,132 @@ var App = angular.module('vsp', ['ngRoute', 'ngAnimate', 'ngStorage', 'ngCookies
 
     }]);
 
-
 /**=========================================================
  * Module: config.js
  * App routes and resources configuration
  =========================================================*/
 
 App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteHelpersProvider',
-        function ($stateProvider, $locationProvider, $urlRouterProvider, helper) {
-            'use strict';
-
-            // Set the following to true to enable the HTML5 Mode
-            // You may have to set <base> tag in index and a routing configuration in your server
-            $locationProvider.html5Mode(false);
-
-            // defaults to dashboard
-            $urlRouterProvider.otherwise('/login');
-
-            //
-            // Application Routes
-            // -----------------------------------
-            $stateProvider
-                .state('app', {
-                    url: '/app',
-                    abstract: true,
-                    templateUrl: helper.basepath('app.html'),
-                    controller: 'AppController',
-                    resolve: helper.resolveFor('fastclick', 'modernizr', 'icons', 'screenfull', 'animo', 'sparklines', 'slimscroll', 'classyloader', 'toaster', 'whirl', 'bootbox', 'moment')
-                })
-                .state('app.search', {
-                    url: '/search',
-                    title: '检索本人绩效',
-                    templateUrl: helper.basepath('search.html'),
-                    resolve: helper.resolveFor('ngDialog'),
-                    controller: 'SearchController'
-                })
-                .state('app.evaluate', {
-                    url: '/evaluate',
-                    title: '填写个人考评',
-                    templateUrl: helper.basepath('evaluate.html'),
-                    resolve: helper.resolveFor('ngDialog'),
-                    controller: 'EvaluateController'
-                })
-                .state('app.result', {
-                    url: '/result',
-                    title: '查看本人绩效',
-                    templateUrl: helper.basepath('result.html'),
-                    resolve: helper.resolveFor('ngDialog'),
-                    controller: 'ResultController'
-                })
-                .state('app.setting', {
-                    url: '/setting',
-                    title: '个人信息维护',
-                    templateUrl: helper.basepath('setting.html'),
-                    resolve: helper.resolveFor('ngDialog'),
-                    controller: 'SearchController'
-                })
-                .state('app.graph', {
-                    url: '/graph',
-                    title: '查看本人成长曲线',
-                    templateUrl: helper.basepath('graph.html'),
-                    resolve: helper.resolveFor('ngDialog', 'chartjs'),
-                    controller: 'GraphController'
-                })
-                .state('login', {
-                    url: '/login',
-                    title: '登录',
-                    templateUrl: 'app/pages/login.html'
-                })
-                .state('logout', {
-                    url: '/logout',
-                    title: '登录',
-                    templateUrl: 'app/pages/login.html'
-                })
-            ;
-
-
-        }]).config(['$ocLazyLoadProvider', 'APP_REQUIRES', function ($ocLazyLoadProvider, APP_REQUIRES) {
+    function ($stateProvider, $locationProvider, $urlRouterProvider, helper) {
         'use strict';
 
-        // Lazy Load modules configuration
-        $ocLazyLoadProvider.config({
-            debug: false,
-            events: true,
-            modules: APP_REQUIRES.modules
-        });
+        // Set the following to true to enable the HTML5 Mode
+        // You may have to set <base> tag in index and a routing configuration in your server
+        $locationProvider.html5Mode(false);
 
-    }]).config(['$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
-        function ($controllerProvider, $compileProvider, $filterProvider, $provide) {
-            'use strict';
-            // registering components after bootstrap
-            App.controller = $controllerProvider.register;
-            App.directive = $compileProvider.directive;
-            App.filter = $filterProvider.register;
-            App.factory = $provide.factory;
-            App.service = $provide.service;
-            App.constant = $provide.constant;
-            App.value = $provide.value;
+        // defaults to dashboard
+        $urlRouterProvider.otherwise('/login');
 
-        }]).config(['tmhDynamicLocaleProvider', function (tmhDynamicLocaleProvider) {
+        //
+        // Application Routes
+        // -----------------------------------
+        $stateProvider
+            .state('app', {
+                url: '/app',
+                abstract: true,
+                templateUrl: helper.basepath('app.html'),
+                controller: 'AppController',
+                resolve: helper.resolveFor('fastclick', 'modernizr', 'icons', 'screenfull', 'animo', 'sparklines', 'slimscroll', 'classyloader', 'toaster', 'whirl', 'bootbox', 'moment')
+            })
+            .state('app.search', {
+                url: '/search',
+                title: '检索本人绩效',
+                templateUrl: helper.basepath('search.html'),
+                resolve: helper.resolveFor('ngDialog'),
+                controller: 'SearchController'
+            })
+            .state('app.evaluate', {
+                url: '/evaluate',
+                title: '填写个人考评',
+                templateUrl: helper.basepath('evaluate.html'),
+                resolve: helper.resolveFor('ngDialog', 'moment'),
+                controller: 'EvaluateController'
+            })
+            .state('app.result', {
+                url: '/result',
+                title: '查看本人绩效',
+                templateUrl: helper.basepath('result.html'),
+                resolve: helper.resolveFor('ngDialog'),
+                controller: 'ResultController'
+            })
+            .state('app.setting', {
+                url: '/setting',
+                title: '个人信息维护',
+                templateUrl: helper.basepath('setting.html'),
+                resolve: helper.resolveFor('ngDialog'),
+                controller: 'SearchController'
+            })
+            .state('app.graph', {
+                url: '/graph',
+                title: '查看本人成长曲线',
+                templateUrl: helper.basepath('graph.html'),
+                resolve: helper.resolveFor('ngDialog', 'chartjs'),
+                controller: 'GraphController'
+            })
+            .state('login', {
+                url: '/login',
+                title: '登录',
+                templateUrl: 'app/pages/login.html'
+            })
+            .state('logout', {
+                url: '/logout',
+                title: '登录',
+                templateUrl: 'app/pages/login.html'
+            })
+        ;
 
-        tmhDynamicLocaleProvider.localeLocationPattern('vendor/angular-i18n/angular-locale_{{locale}}.js');
 
-        // tmhDynamicLocaleProvider.useStorage('$cookieStore');
+    }]).config(['$ocLazyLoadProvider', 'APP_REQUIRES', function ($ocLazyLoadProvider, APP_REQUIRES) {
+    'use strict';
 
-    }]).config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
-        cfpLoadingBarProvider.includeBar = true;
-        cfpLoadingBarProvider.includeSpinner = false;
-        cfpLoadingBarProvider.latencyThreshold = 500;
-        cfpLoadingBarProvider.parentSelector = '.wrapper > section';
-    }]).factory('httpInterceptor',
+    // Lazy Load modules configuration
+    $ocLazyLoadProvider.config({
+        debug: false,
+        events: true,
+        modules: APP_REQUIRES.modules
+    });
+
+}]).config(['$controllerProvider', '$compileProvider', '$filterProvider', '$provide',
+    function ($controllerProvider, $compileProvider, $filterProvider, $provide) {
+        'use strict';
+        // registering components after bootstrap
+        App.controller = $controllerProvider.register;
+        App.directive = $compileProvider.directive;
+        App.filter = $filterProvider.register;
+        App.factory = $provide.factory;
+        App.service = $provide.service;
+        App.constant = $provide.constant;
+        App.value = $provide.value;
+
+    }]).config(['tmhDynamicLocaleProvider', function (tmhDynamicLocaleProvider) {
+
+    tmhDynamicLocaleProvider.localeLocationPattern('vendor/angular-i18n/angular-locale_{{locale}}.js');
+
+    // tmhDynamicLocaleProvider.useStorage('$cookieStore');
+
+}]).config(['cfpLoadingBarProvider', function (cfpLoadingBarProvider) {
+    cfpLoadingBarProvider.includeBar = true;
+    cfpLoadingBarProvider.includeSpinner = false;
+    cfpLoadingBarProvider.latencyThreshold = 500;
+    cfpLoadingBarProvider.parentSelector = '.wrapper > section';
+}]).factory('httpInterceptor',
     ["$q", "$rootScope", function ($q, $rootScope) {
         return {
             'request': function (config) {
-                $rootScope.loading = 1;
                 return config;
             },
             'response': function (response) {
-                $rootScope.loading = 0;
-                return response;
-            },
+                return response || $q.when(response);
+                },
             'requestError': function (rejection) {
                 return response;
             },
             'responseError': function (rejection) {
-                if (rejection.status == 401) {
-                    window.location.href = '/merchants';
-                }
-                return rejection;
+                return $q.reject(rejection);
             }
         };
-    }]).config(["$httpProvider", function ($httpProvider) {
+    }])
+    .config(["$httpProvider", function ($httpProvider) {
         $httpProvider.interceptors.push('httpInterceptor');
     }])
 
@@ -301,12 +298,9 @@ App
             {name: 'ngDialog', files: ['vendor/ngDialog/js/ngDialog.min.js',
                 'vendor/ngDialog/css/ngDialog.min.css',
                 'vendor/ngDialog/css/ngDialog-theme-default.min.css'] },
-            {name: 'ngWig', files: ['vendor/ngWig/dist/ng-wig.min.js'] },
             {name: 'ngTable', files: ['vendor/ng-table/dist/ng-table.min.js',
                 'vendor/ng-table/dist/ng-table.min.css']},
             {name: 'ngTableExport', files: ['vendor/ng-table-export/ng-table-export.js']},
-            {name: 'angularBootstrapNavTree', files: ['vendor/angular-bootstrap-nav-tree/dist/abn_tree_directive.js',
-                'vendor/angular-bootstrap-nav-tree/dist/abn_tree.css']},
             {name: 'htmlSortable', files: ['vendor/html.sortable/dist/html.sortable.js',
                 'vendor/html.sortable/dist/html.sortable.angular.js']},
             {name: 'xeditable', files: ['vendor/angular-xeditable/dist/js/xeditable.js',
@@ -322,24 +316,6 @@ App
             {name: 'ngGrid', files: ['vendor/ng-grid/build/ng-grid.min.js',
                 'vendor/ng-grid/ng-grid.css' ]},
             {name: 'infinite-scroll', files: ['vendor/ngInfiniteScroll/build/ng-infinite-scroll.js']},
-            {name: 'com.2fdevs.videogular', files: ['vendor/videogular/videogular.min.js']},
-            {name: 'com.2fdevs.videogular.plugins.buffering',
-                files: ['vendor/videogular-buffering/vg-buffering.min.js']},
-            {name: 'com.2fdevs.videogular.plugins.controls',
-                files: ['vendor/videogular-controls/vg-controls.min.js']},
-            {name: 'com.2fdevs.videogular.plugins.overlayplay',
-                files: ['vendor/videogular-overlay-play/vg-overlay-play.min.js']} ,
-            {name: 'qiniu-js-sdk1', files: [ 'vendor/qiniu-js-sdk/qiniu.js',
-                'vendor/qiniu-js-sdk/plupload/plupload.min.js',          ,
-                'vendor/qiniu-js-sdk/plupload/jquery.ui.plupload/jquery.ui.plupload.min.js',
-                'vendor/qiniu-js-sdk/jquery-1.9.1.min.js',
-                'vendor/qiniu-js-sdk/plupload/moxie.min.js',
-                'vendor/qiniu-js-sdk/plupload/plupload.full.min.js',
-                'vendor/qiniu-js-sdk/plupload/i18n/zh_CN.js',
-                'vendor/qiniu-js-sdk/ui.js',
-                'vendor/qiniu-js-sdk/highlight/highlight.js',
-                'vendor/qiniu-js-sdk/main.js',
-                'vendor/qiniu-js-sdk/qupload.js']}
         ]
 
     })
@@ -356,9 +332,11 @@ App.controller('LoginFormController', ['$scope', '$rootScope', '$http', '$state'
     $scope.login = function () {
         $scope.authMsg = '正在登陆中...';
         //$state.go('app.evaluate');
-
         $http
-            .post($rootScope.url+'/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password)
+        ({
+            method: 'POST',
+            url: $rootScope.url + '/account-service/person/login?account=' + $scope.account.username + '&password=' + $scope.account.password
+        })
             .then(function (response) {
                 if (response.data.status != 200) {
                     $scope.authMsg = response.data.message;
@@ -467,46 +445,47 @@ App.controller('DatepickerCtrl', ['$scope', function ($scope) {
  * Module: EvaluateController.js
  =========================================================*/
 
-App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
+ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
     function ($scope, $http, $rootScope, $state) {
         var loadRelations = function () {
             $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
-                .then(function (response) {
-                    if (response.data.status === 200) {
-                        $scope.relations = response.data.data;
-                        $scope.department = $scope.relations[0];
-                        loadIndex();
-                    } else {
-                        $.notify(response.data.message, 'danger');
-                    }
-                }, function (x) {
-                    $.notify('服务器出了点问题，我们正在处理', 'danger');
-                });
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.relations = response.data.data;
+                    $scope.department = $scope.relations[0];
+                    loadIndex();
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
         }
         var loadIndex = function () {
 
             $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
-                .then(function (response) {
-                    if (response.data.status === 200) {
-                        $scope.data = response.data.data;
-                        $scope.data.forEach(function (item) {
-                            $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
-                                .then(function (response) {
-                                    if (response.data.status === 200) {
-                                        item['items'] = response.data.data;
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.data = response.data.data;
+                    $scope.data.forEach(function (item) {
+                        $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
+                        .then(function (response) {
+                            if (response.data.status === 200) {
+                                item['items'] = response.data.data;
+                                        //console.log('data:' + JSON.stringify($scope.data));
                                     } else {
                                         $.notify(response.data.message, 'danger');
                                     }
                                 }, function (x) {
                                     $.notify('服务器出了点问题，我们正在处理', 'danger');
                                 });
-                        })
-                    } else {
-                        $.notify(response.data.message, 'danger');
-                    }
-                }, function (x) {
-                    $.notify('服务器出了点问题，我们正在处理', 'danger');
-                });
+                    })
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
         }
 
         $scope.changeDepartment = loadIndex;
@@ -516,34 +495,34 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
              {
                  id : "0",
                  level : "0",
-                 index_name : "政治工作",
+                 indexName : "政治工作",
                  items :
                  [
                  {
                      id : "1",
-                     department_id : "1",
-                     index_name: "学习",
-                     increase_name : "好好学习",
-                     increase_point : 2,
-                     increase_unit: "次",
-                     decrease_name : "没出操",
-                     decrease_point : 1,
-                     decrease_unit: "次",
+                     departmentId : "1",
+                     indexName: "学习",
+                     increaseName : "好好学习",
+                     increasePoint : 2,
+                     increaseUnit: "次",
+                     decreaseName : "没出操",
+                     decreasePoint : 1,
+                     decreaseUnit: "次",
                      level : "1",
-                     father_id : "0",
+                     fatherId : "0",
                  },
                  {
                      id : "2",
-                     department_id : "1",
-                     index_name: "党务",
-                     increase_name : "好好学习",
-                     increase_point : 2,
-                     increase_unit: "次",
-                     decrease_name : "没出操",
-                     decrease_point : 1,
-                     decrease_unit: "次",
+                     departmentId : "1",
+                     indexName: "党务",
+                     increaseName : "好好学习",
+                     increasePoint : 2,
+                     increaseUnit: "次",
+                     decreaseName : "没出操",
+                     decreasePoint : 1,
+                     decreaseUnit: "次",
                      level : "1",
-                     father_id : "0",
+                     fatherId : "0",
                  }
                  ]
 
@@ -551,77 +530,77 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
              {
                  id : "3",
                  level : "0",
-                 index_name : "训练工作",
+                 indexName : "训练工作",
                  items :
                  [
                  {
                      id : "4",
-                     department_id : "1",
-                     index_name: "党务",
-                     increase_name : "好好学习",
-                     increase_point : 2,
-                     increase_unit: "次",
-                     decrease_name : "没出操",
-                     decrease_point : 1,
-                     decrease_unit: "次",
+                     departmentId : "1",
+                     indexName: "党务",
+                     increaseName : "好好学习",
+                     increasePoint : 2,
+                     increaseUnit: "次",
+                     decreaseName : "没出操",
+                     decreasePoint : 1,
+                     decreaseUnit: "次",
                      level : "1",
-                     father_id : "3",
+                     fatherId : "3",
                  },
                  {
                     id : "5",
-                    department_id : "1",
-                    index_name: "党务",
-                    increase_name : "好好学习",
-                    increase_point : 2,
-                    increase_unit: "次",
-                    decrease_name : "没出操",
-                    decrease_point : 1,
-                    decrease_unit: "次",
+                    departmentId : "1",
+                    indexName: "党务",
+                    increaseName : "好好学习",
+                    increasePoint : 2,
+                    increaseUnit: "次",
+                    decreaseName : "没出操",
+                    decreasePoint : 1,
+                    decreaseUnit: "次",
                     level : "1",
-                    father_id : "3",
+                    fatherId : "3",
                 }
                 ]
             }
             ];*/
 
-        $scope.totalPoints = 0;
+            $scope.totalPoints = 0;
 
-        $scope.operate = function (item, index, step) {
-            if (index === 0) {
-                var val = item.increase_num;
-                item.increase_num = doPlus(val, step);
-            }
-            else if (index === 1) {
-                var val = item.decrease_num;
-                item.decrease_num = doPlus(val, step);
-            }
-            if (isNaN(item.increase_num) || item.increase_num === "") {
-                item.increase_num = 0;
-            }
-            if (isNaN(item.decrease_num) || item.decrease_num === "") {
-                item.decrease_num = 0;
-            }
-            if (!isNaN(item.total_point)) {
-                $scope.totalPoints -= item.total_point;
-            }
-            item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
-            $scope.totalPoints += item.total_point;
-        };
+            $scope.operate = function (item, index, step) {
+                if (index === 0) {
+                    var val = item.increaseNum;
+                    item.increaseNum = doPlus(val, step);
+                }
+                else if (index === 1) {
+                    var val = item.decreaseNum;
+                    item.decreaseNum = doPlus(val, step);
+                }
+                if (isNaN(item.increaseNum) || item.increaseNum === "") {
+                    item.increaseNum = 0;
+                }
+                if (isNaN(item.decreaseNum) || item.decreaseNum === "") {
+                    item.decreaseNum = 0;
+                }
+                if (!isNaN(item.totalPoint)) {
+                    $scope.totalPoints -= item.totalPoint;
+                }
+                item.totalPoint = item.increaseNum * item.increasePoint - item.decreaseNum * item.decreasePoint;
+                $scope.totalPoints += item.totalPoint;
+            };
 
-        var doPlus = function (val, step) {
-            if (isNaN(val)) {
-                val = 0;
-            }
-            val = Math.abs(val);
-            val = Math.floor(val);
-            val += step;
-            if (val < 0) {
-                val = 0;
-            }
-            return val;
-        };
+            var doPlus = function (val, step) {
+                if (isNaN(val)) {
+                    val = 0;
+                }
+                val = Math.abs(val);
+                val = Math.floor(val);
+                val += step;
+                if (val < 0) {
+                    val = 0;
+                }
+                return val;
+            };
 
-        var
+            var
             buildParam = function (url) {
                 var param = {
                     method: 'GET',
@@ -644,77 +623,109 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             };
 
 
-        $scope.submit = function () {
+            $scope.submit = function () {
 
-            var dataPost = {};
+                var dataPost = {};
 
             //所有条目都相同的部分
-            //读$rootScope
-            dataPost.person_id = $rootScope.person.person_id;
-            dataPost.department_id = $rootScope.person.department_id;
-            dataPost.department_name = $rootScope.person.department_name;
-            //下面都是读$scope
-            dataPost.standard_date = $scope.datePicked;
-            dataPost.submit_time = (new Date()).toLocaleTimeString();
+            dataPost.personId = $scope.department.personId;
+            dataPost.departmentId = $scope.department.departmentId;
+            dataPost.departmentName = $scope.department.departmentName;
+            // console.log(JSON.stringify($scope.department));
+            dataPost.standardDate = $scope.datePicked;
+            dataPost.submitTime = moment().format('YYYY-MM-DD hh:mm:ss');
 
             var postFlag = false;
 
             //每个条目不同的部分
             //对于每个大项
             $scope.data.forEach(function (data_i, index) {
-                var hasValue = false;
-                //对于每个小条目
+
+                var fatherId = 0;
+                var hasFatherId = false;
+                //对于每个小条目。必须直接遍历小条目，因为有的大项里面没有任何有效记录，就不能加入。
                 data_i.items.forEach(function (item, index) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point !== "") {
-                        //***需要服务端提供***
-                        var father_id = 0;
-
-                        //如果大项还没加入过，先提交大项条目，获取father_id
-                        if (!hasValue) {
-                            dataPost.index_name = data_i.index_name;
+                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
+                        //如果大项还没加入过，先提交大项条目，获取fatherId
+                        if (!hasFatherId) {
+                            dataPost.indexName = data_i.indexName;
                             dataPost.level = data_i.level;
-                            // $http.post('/url', dataPost).then(function (response) {
-                            //     if (response.data.status === 200) {
-                            //         father_id = response.data.data;
-                            //     } else {
-                            //         $.notify(response.data.message, 'danger');
-                            //     }
-                            // }, function (x) {
-                            //     $.notify('服务器出了点问题，我们正在处理', 'danger');
-                            // });
-                            hasValue = true;
+                            dataPost.fatherId = 0;
+                            console.log(JSON.stringify(dataPost));
+                            $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
+                                if (response.data.status === 200) {
+
+                                    fatherId = response.data.data.id;
+                                    console.log('add level 0 fatherID=' + fatherId);
+
+                                    //提交该小条目。放到这里面是为了配合异步传输机制。
+                                    dataPost.indexName = item.indexName;
+                                    dataPost.increaseName = item.increaseName;
+                                    dataPost.increaseNum = item.increaseNum;
+                                    dataPost.increasePoint = item.increasePoint;
+                                    dataPost.increaseUnit = item.increaseUnit;
+                                    dataPost.increaseDetail = item.increaseDetail;
+                                    dataPost.decreaseName = item.decreaseName;
+                                    dataPost.decreaseNum = item.decreaseNum;
+                                    dataPost.decreasePodet = item.decreasePodet;
+                                    dataPost.decreaseUnit = item.decreaseUnit;
+                                    dataPost.decreaseDetail = item.decreaseDetail;
+                                    dataPost.totalPoint = item.totalPoint;
+                                    dataPost.level = item.level;
+                                    dataPost.fatherId = fatherId;
+
+                                    $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
+                                        if (response.data.status === 200) {
+                                            console.log('add okkkk');
+                                        } else {
+                                            $.notify(response.data.message, 'danger');
+                                        }
+                                    }, function (x) {
+                                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                    });
+
+                                } else {
+                                    $.notify(response.data.message, 'danger');
+                                }
+                            }, function (x) {
+                                $.notify('服务器出了点问题，我们正在处理', 'danger');
+                            });
+                            hasFatherId = true;
                             postFlag = true;
                         }
+                        //已经有了fatherId
+                        else{
+                                    //直接提交该小条目
+                                    dataPost.indexName = item.indexName;
+                                    dataPost.increaseName = item.increaseName;
+                                    dataPost.increaseNum = item.increaseNum;
+                                    dataPost.increasePoint = item.increasePoint;
+                                    dataPost.increaseUnit = item.increaseUnit;
+                                    dataPost.increaseDetail = item.increaseDetail;
+                                    dataPost.decreaseName = item.decreaseName;
+                                    dataPost.decreaseNum = item.decreaseNum;
+                                    dataPost.decreasePodet = item.decreasePodet;
+                                    dataPost.decreaseUnit = item.decreaseUnit;
+                                    dataPost.decreaseDetail = item.decreaseDetail;
+                                    dataPost.totalPoint = item.totalPoint;
+                                    dataPost.level = item.level;
+                                    dataPost.fatherId = fatherId;
 
-                        //提交该小条目
-                        dataPost.index_name = item.index_name;
-                        dataPost.increase_name = item.increase_name;
-                        dataPost.increase_num = item.increase_num;
-                        dataPost.increase_point = item.increase_point;
-                        dataPost.increase_unit = item.increase_unit;
-                        dataPost.increase_detail = item.increase_detail;
-                        dataPost.decrease_name = item.decrease_name;
-                        dataPost.decrease_num = item.decrease_num;
-                        dataPost.decrease_podet = item.decrease_podet;
-                        dataPost.decrease_unit = item.decrease_unit;
-                        dataPost.decrease_detail = item.decrease_detail;
-                        dataPost.total_point = item.total_point;
-                        dataPost.level = item.level;
-                        dataPost.father_id = father_id;
+                                    $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
+                                        if (response.data.status === 200) {
+                                            console.log('add okkkk');
+                                        } else {
+                                            $.notify(response.data.message, 'danger');
+                                        }
+                                    }, function (x) {
+                                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                    });
+                        }
 
-                        // $http.post('/url', dataPost).then(function (response) {
-                        //     if (response.data.status === 200) {
-                        //
-                        //     } else {
-                        //         $.notify(response.data.message, 'danger');
-                        //           break;
-                        //     }
-                        // }, function (x) {
-                        //     $.notify('服务器出了点问题，我们正在处理', 'danger');
-                        //     break;
-                        // });
-                        alert(dataPost.total_point + dataPost.submit_time);
+
+
+                        //alert("已提交");
                     }
 
                 });
@@ -728,18 +739,18 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         };
 
         $scope.reset = function (item) {
-            $scope.totalPoints -= item.total_point;
-            item.increase_num = "";
-            item.increase_detail = "";
-            item.decrease_num = "";
-            item.decrease_detail = "";
-            item.total_point = "";
+            $scope.totalPoints -= item.totalPoint;
+            item.increaseNum = "";
+            item.increaseDetail = "";
+            item.decreaseNum = "";
+            item.decreaseDetail = "";
+            item.totalPoint = "";
         };
         $scope.resetAll = function () {
             $scope.data.forEach(function (data_i, index) {
                 data_i.items.forEach(function (item) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point !== "") {
+                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
                         $scope.reset(item);
                     }
                 });
@@ -747,7 +758,8 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         };
 
         //把日期格式2018/04/20替换为2018-04-20
-        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g, '-');
+        // $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g, '-');
+        $scope.datePicked = moment().format('YYYY-MM-DD');
         //页面载入时日历是否自动打开
         $scope.opened = {
             start: false,
@@ -1063,122 +1075,111 @@ App.controller('AppController',
 
  App.controller('ResultController', ['$scope', '$http', '$rootScope', '$state', 
     function ($scope, $http, $rootScope, $state) {
-
+        var loadResults = function () {
+            $http.get($rootScope.url + '/standard-service/result/list').then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.data = response.data.data;
+                    console.log('list ok');
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
+        }
         //***需要替换为从后台获取的数据***
-        $scope.data = [
-        {
-            id : "0",
-            level : "0",
-            index_name : "政治工作",
-            standard_date : "2018-04-26",
-            items :
-            [
-            {
-                id : "1",
-                department_id : "1",
-                index_name: "学习",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                increase_num: 3,
-                increase_detail: "听话",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                decrease_num: 2,
-                decrease_detail: "不听话",
-                total_point: 100,
-                level : "1",
-                father_id : "0",
-            },
-            {
-                id : "1",
-                department_id : "1",
-                index_name: "学习",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                increase_num: 2,
-                increase_detail: "听话",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                decrease_num: 1,
-                decrease_detail: "不听话",
-                total_point: 100,
-                level : "1",
-                father_id : "0",
-            }
-            ]
+        // $scope.data = [
+        // {
+        //     id : "0",
+        //     level : "0",
+        //     indexName : "政治工作",
+        //     standard_date : "2018-04-26",
+        //     items :
+        //     [
+        //     {
+        //         id : "1",
+        //         department_id : "1",
+        //         indexName: "学习",
+        //         increase_name : "好好学习",
+        //         increase_point : 2,
+        //         increase_unit: "次",
+        //         increase_num: 3,
+        //         increase_detail: "听话",
+        //         decrease_name : "没出操",
+        //         decrease_point : 1,
+        //         decrease_unit: "次",
+        //         decrease_num: 2,
+        //         decrease_detail: "不听话",
+        //         total_point: 100,
+        //         level : "1",
+        //         father_id : "0",
+        //     },
+        //     {
+        //         id : "1",
+        //         department_id : "1",
+        //         indexName: "学习",
+        //         increase_name : "好好学习",
+        //         increase_point : 2,
+        //         increase_unit: "次",
+        //         increase_num: 2,
+        //         increase_detail: "听话",
+        //         decrease_name : "没出操",
+        //         decrease_point : 1,
+        //         decrease_unit: "次",
+        //         decrease_num: 1,
+        //         decrease_detail: "不听话",
+        //         total_point: 100,
+        //         level : "1",
+        //         father_id : "0",
+        //     }
+        //     ]
 
-        },
-        {
-            id : "3",
-            level : "0",
-            index_name : "训练工作",
-            items :
-            [
-            {
-                id : "1",
-                department_id : "1",
-                index_name: "学习",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                increase_num: 3,
-                increase_detail: "听话",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                decrease_num: 2,
-                decrease_detail: "不听话",
-                total_point: 80,
-                level : "1",
-                father_id : "0",
-            },
-            {
-                id : "1",
-                department_id : "1",
-                index_name: "学习",
-                increase_name : "好好学习",
-                increase_point : 2,
-                increase_unit: "次",
-                increase_num: 3,
-                increase_detail: "听话",
-                decrease_name : "没出操",
-                decrease_point : 1,
-                decrease_unit: "次",
-                decrease_num: 2,
-                decrease_detail: "不听话",
-                total_point: 50,
-                level : "1",
-                father_id : "0",
-         }
-         ]
-     }
-     ];
-
-    var
-    buildParam = function (url) {
-        var param = {
-            method: 'GET',
-            url: url,
-            params: $scope.search
-        };
-        return param;
-    },
-    loadData = function (url) {
-            // $http(buildParam(url))
-            //     .then(function (response) {
-            //         if (response.data.status === 200) {
-            //             $scope.data = response.data.data.list;
-            //         } else {
-            //             $.notify(response.data.message, 'danger');
-            //         }
-            //     }, function (x) {
-            //         $.notify('服务器出了点问题，我们正在处理', 'danger');
-            //     });
-        };
+        // },
+        // {
+        //     id : "3",
+        //     level : "0",
+        //     indexName : "训练工作",
+        //     items :
+        //     [
+        //     {
+        //         id : "1",
+        //         department_id : "1",
+        //         indexName: "学习",
+        //         increase_name : "好好学习",
+        //         increase_point : 2,
+        //         increase_unit: "次",
+        //         increase_num: 3,
+        //         increase_detail: "听话",
+        //         decrease_name : "没出操",
+        //         decrease_point : 1,
+        //         decrease_unit: "次",
+        //         decrease_num: 2,
+        //         decrease_detail: "不听话",
+        //         total_point: 80,
+        //         level : "1",
+        //         father_id : "0",
+        //     },
+        //     {
+        //         id : "1",
+        //         department_id : "1",
+        //         indexName: "学习",
+        //         increase_name : "好好学习",
+        //         increase_point : 2,
+        //         increase_unit: "次",
+        //         increase_num: 3,
+        //         increase_detail: "听话",
+        //         decrease_name : "没出操",
+        //         decrease_point : 1,
+        //         decrease_unit: "次",
+        //         decrease_num: 2,
+        //         decrease_detail: "不听话",
+        //         total_point: 50,
+        //         level : "1",
+        //         father_id : "0",
+        //     }
+        //     ]
+        // }
+        // ];
 
 
 
@@ -1188,6 +1189,8 @@ App.controller('AppController',
         });
         $(window).resize();
 
+        loadResults();
+        
         $scope.back = function(){
             $state.go('app.evaluate');
         };

@@ -11,13 +11,13 @@ style.
     }
 
 p 
-    span.col-sm-2 姓名：{{person.username}}
-    span 部门：{{person.department_name}}
+    span.col-sm-2 姓名：{{$root.account.username}}
+    span 部门：{{data[0].departmentName}}
 
 hr
 p
-    span.h4 日期：
-    span {{data[0].standard_date}}
+    span.col-sm-2  日期：
+    span {{data[0].standardDate}}
 hr
 #container.row(style='overflow-y: scroll')
 
@@ -26,7 +26,7 @@ hr
         .panel.panel-default
                 .form-group(ng-repeat='data_i in data')
                     // START table-responsive
-                    h4(style="text-align:center") {{data_i.index_name}}
+                    h4(style="text-align:center") {{data_i.indexName}}
                     hr
                     .table-responsive
                         table.table.table-bordered.table-condensed.table-hover
@@ -44,14 +44,14 @@ hr
                             tbody(ng-repeat='item in data_i.items')
                                 tr
                                     td {{$index+1}}
-                                    td {{item.index_name}}
-                                    td {{item.increase_name}}({{item.increase_point}}分/{{item.increase_unit}})
-                                    td {{item.increase_num}}
-                                    td {{item.increase_detail}}
-                                    td {{item.decrease_name}}(-{{item.decrease_point}}分/{{item.decrease_unit}})
-                                    td {{item.increase_num}}
-                                    td {{item.decrease_detail}}
-                                    td {{item.total_point}}
+                                    td {{item.indexName}}
+                                    td {{item.increaseName}}({{item.increasePoint}}分/{{item.increaseUnit}})
+                                    td {{item.increaseNum}}
+                                    td {{item.increaseDetail}}
+                                    td {{item.decreaseName}}(-{{item.decreasePoint}}分/{{item.decreaseUnit}})
+                                    td {{item.increaseNum}}
+                                    td {{item.decreaseDetail}}
+                                    td {{item.totalPoint}}
                             tfoot
                                 tr(ng-if='results.length===0')
                                     td(colspan='11') 暂无数据

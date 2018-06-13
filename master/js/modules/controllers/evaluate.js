@@ -2,46 +2,47 @@
  * Module: EvaluateController.js
  =========================================================*/
 
-App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
+ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
     function ($scope, $http, $rootScope, $state) {
         var loadRelations = function () {
             $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
-                .then(function (response) {
-                    if (response.data.status === 200) {
-                        $scope.relations = response.data.data;
-                        $scope.department = $scope.relations[0];
-                        loadIndex();
-                    } else {
-                        $.notify(response.data.message, 'danger');
-                    }
-                }, function (x) {
-                    $.notify('服务器出了点问题，我们正在处理', 'danger');
-                });
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.relations = response.data.data;
+                    $scope.department = $scope.relations[0];
+                    loadIndex();
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
         }
         var loadIndex = function () {
 
             $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
-                .then(function (response) {
-                    if (response.data.status === 200) {
-                        $scope.data = response.data.data;
-                        $scope.data.forEach(function (item) {
-                            $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
-                                .then(function (response) {
-                                    if (response.data.status === 200) {
-                                        item['items'] = response.data.data;
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.data = response.data.data;
+                    $scope.data.forEach(function (item) {
+                        $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
+                        .then(function (response) {
+                            if (response.data.status === 200) {
+                                item['items'] = response.data.data;
+                                        //console.log('data:' + JSON.stringify($scope.data));
                                     } else {
                                         $.notify(response.data.message, 'danger');
                                     }
                                 }, function (x) {
                                     $.notify('服务器出了点问题，我们正在处理', 'danger');
                                 });
-                        })
-                    } else {
-                        $.notify(response.data.message, 'danger');
-                    }
-                }, function (x) {
-                    $.notify('服务器出了点问题，我们正在处理', 'danger');
-                });
+                    })
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
         }
 
         $scope.changeDepartment = loadIndex;
@@ -51,34 +52,34 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
              {
                  id : "0",
                  level : "0",
-                 index_name : "政治工作",
+                 indexName : "政治工作",
                  items :
                  [
                  {
                      id : "1",
-                     department_id : "1",
-                     index_name: "学习",
-                     increase_name : "好好学习",
-                     increase_point : 2,
-                     increase_unit: "次",
-                     decrease_name : "没出操",
-                     decrease_point : 1,
-                     decrease_unit: "次",
+                     departmentId : "1",
+                     indexName: "学习",
+                     increaseName : "好好学习",
+                     increasePoint : 2,
+                     increaseUnit: "次",
+                     decreaseName : "没出操",
+                     decreasePoint : 1,
+                     decreaseUnit: "次",
                      level : "1",
-                     father_id : "0",
+                     fatherId : "0",
                  },
                  {
                      id : "2",
-                     department_id : "1",
-                     index_name: "党务",
-                     increase_name : "好好学习",
-                     increase_point : 2,
-                     increase_unit: "次",
-                     decrease_name : "没出操",
-                     decrease_point : 1,
-                     decrease_unit: "次",
+                     departmentId : "1",
+                     indexName: "党务",
+                     increaseName : "好好学习",
+                     increasePoint : 2,
+                     increaseUnit: "次",
+                     decreaseName : "没出操",
+                     decreasePoint : 1,
+                     decreaseUnit: "次",
                      level : "1",
-                     father_id : "0",
+                     fatherId : "0",
                  }
                  ]
 
@@ -86,77 +87,77 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
              {
                  id : "3",
                  level : "0",
-                 index_name : "训练工作",
+                 indexName : "训练工作",
                  items :
                  [
                  {
                      id : "4",
-                     department_id : "1",
-                     index_name: "党务",
-                     increase_name : "好好学习",
-                     increase_point : 2,
-                     increase_unit: "次",
-                     decrease_name : "没出操",
-                     decrease_point : 1,
-                     decrease_unit: "次",
+                     departmentId : "1",
+                     indexName: "党务",
+                     increaseName : "好好学习",
+                     increasePoint : 2,
+                     increaseUnit: "次",
+                     decreaseName : "没出操",
+                     decreasePoint : 1,
+                     decreaseUnit: "次",
                      level : "1",
-                     father_id : "3",
+                     fatherId : "3",
                  },
                  {
                     id : "5",
-                    department_id : "1",
-                    index_name: "党务",
-                    increase_name : "好好学习",
-                    increase_point : 2,
-                    increase_unit: "次",
-                    decrease_name : "没出操",
-                    decrease_point : 1,
-                    decrease_unit: "次",
+                    departmentId : "1",
+                    indexName: "党务",
+                    increaseName : "好好学习",
+                    increasePoint : 2,
+                    increaseUnit: "次",
+                    decreaseName : "没出操",
+                    decreasePoint : 1,
+                    decreaseUnit: "次",
                     level : "1",
-                    father_id : "3",
+                    fatherId : "3",
                 }
                 ]
             }
             ];*/
 
-        $scope.totalPoints = 0;
+            $scope.totalPoints = 0;
 
-        $scope.operate = function (item, index, step) {
-            if (index === 0) {
-                var val = item.increase_num;
-                item.increase_num = doPlus(val, step);
-            }
-            else if (index === 1) {
-                var val = item.decrease_num;
-                item.decrease_num = doPlus(val, step);
-            }
-            if (isNaN(item.increase_num) || item.increase_num === "") {
-                item.increase_num = 0;
-            }
-            if (isNaN(item.decrease_num) || item.decrease_num === "") {
-                item.decrease_num = 0;
-            }
-            if (!isNaN(item.total_point)) {
-                $scope.totalPoints -= item.total_point;
-            }
-            item.total_point = item.increase_num * item.increase_point - item.decrease_num * item.decrease_point;
-            $scope.totalPoints += item.total_point;
-        };
+            $scope.operate = function (item, index, step) {
+                if (index === 0) {
+                    var val = item.increaseNum;
+                    item.increaseNum = doPlus(val, step);
+                }
+                else if (index === 1) {
+                    var val = item.decreaseNum;
+                    item.decreaseNum = doPlus(val, step);
+                }
+                if (isNaN(item.increaseNum) || item.increaseNum === "") {
+                    item.increaseNum = 0;
+                }
+                if (isNaN(item.decreaseNum) || item.decreaseNum === "") {
+                    item.decreaseNum = 0;
+                }
+                if (!isNaN(item.totalPoint)) {
+                    $scope.totalPoints -= item.totalPoint;
+                }
+                item.totalPoint = item.increaseNum * item.increasePoint - item.decreaseNum * item.decreasePoint;
+                $scope.totalPoints += item.totalPoint;
+            };
 
-        var doPlus = function (val, step) {
-            if (isNaN(val)) {
-                val = 0;
-            }
-            val = Math.abs(val);
-            val = Math.floor(val);
-            val += step;
-            if (val < 0) {
-                val = 0;
-            }
-            return val;
-        };
+            var doPlus = function (val, step) {
+                if (isNaN(val)) {
+                    val = 0;
+                }
+                val = Math.abs(val);
+                val = Math.floor(val);
+                val += step;
+                if (val < 0) {
+                    val = 0;
+                }
+                return val;
+            };
 
-        var
+            var
             buildParam = function (url) {
                 var param = {
                     method: 'GET',
@@ -179,77 +180,109 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             };
 
 
-        $scope.submit = function () {
+            $scope.submit = function () {
 
-            var dataPost = {};
+                var dataPost = {};
 
             //所有条目都相同的部分
-            //读$rootScope
-            dataPost.person_id = $rootScope.person.person_id;
-            dataPost.department_id = $rootScope.person.department_id;
-            dataPost.department_name = $rootScope.person.department_name;
-            //下面都是读$scope
-            dataPost.standard_date = $scope.datePicked;
-            dataPost.submit_time = (new Date()).toLocaleTimeString();
+            dataPost.personId = $scope.department.personId;
+            dataPost.departmentId = $scope.department.departmentId;
+            dataPost.departmentName = $scope.department.departmentName;
+            // console.log(JSON.stringify($scope.department));
+            dataPost.standardDate = $scope.datePicked;
+            dataPost.submitTime = moment().format('YYYY-MM-DD hh:mm:ss');
 
             var postFlag = false;
 
             //每个条目不同的部分
             //对于每个大项
             $scope.data.forEach(function (data_i, index) {
-                var hasValue = false;
-                //对于每个小条目
+
+                var fatherId = 0;
+                var hasFatherId = false;
+                //对于每个小条目。必须直接遍历小条目，因为有的大项里面没有任何有效记录，就不能加入。
                 data_i.items.forEach(function (item, index) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point !== "") {
-                        //***需要服务端提供***
-                        var father_id = 0;
-
-                        //如果大项还没加入过，先提交大项条目，获取father_id
-                        if (!hasValue) {
-                            dataPost.index_name = data_i.index_name;
+                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
+                        //如果大项还没加入过，先提交大项条目，获取fatherId
+                        if (!hasFatherId) {
+                            dataPost.indexName = data_i.indexName;
                             dataPost.level = data_i.level;
-                            // $http.post('/url', dataPost).then(function (response) {
-                            //     if (response.data.status === 200) {
-                            //         father_id = response.data.data;
-                            //     } else {
-                            //         $.notify(response.data.message, 'danger');
-                            //     }
-                            // }, function (x) {
-                            //     $.notify('服务器出了点问题，我们正在处理', 'danger');
-                            // });
-                            hasValue = true;
+                            dataPost.fatherId = 0;
+                            console.log(JSON.stringify(dataPost));
+                            $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
+                                if (response.data.status === 200) {
+
+                                    fatherId = response.data.data.id;
+                                    console.log('add level 0 fatherID=' + fatherId);
+
+                                    //提交该小条目。放到这里面是为了配合异步传输机制。
+                                    dataPost.indexName = item.indexName;
+                                    dataPost.increaseName = item.increaseName;
+                                    dataPost.increaseNum = item.increaseNum;
+                                    dataPost.increasePoint = item.increasePoint;
+                                    dataPost.increaseUnit = item.increaseUnit;
+                                    dataPost.increaseDetail = item.increaseDetail;
+                                    dataPost.decreaseName = item.decreaseName;
+                                    dataPost.decreaseNum = item.decreaseNum;
+                                    dataPost.decreasePodet = item.decreasePodet;
+                                    dataPost.decreaseUnit = item.decreaseUnit;
+                                    dataPost.decreaseDetail = item.decreaseDetail;
+                                    dataPost.totalPoint = item.totalPoint;
+                                    dataPost.level = item.level;
+                                    dataPost.fatherId = fatherId;
+
+                                    $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
+                                        if (response.data.status === 200) {
+                                            console.log('add okkkk');
+                                        } else {
+                                            $.notify(response.data.message, 'danger');
+                                        }
+                                    }, function (x) {
+                                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                    });
+
+                                } else {
+                                    $.notify(response.data.message, 'danger');
+                                }
+                            }, function (x) {
+                                $.notify('服务器出了点问题，我们正在处理', 'danger');
+                            });
+                            hasFatherId = true;
                             postFlag = true;
                         }
+                        //已经有了fatherId
+                        else{
+                                    //直接提交该小条目
+                                    dataPost.indexName = item.indexName;
+                                    dataPost.increaseName = item.increaseName;
+                                    dataPost.increaseNum = item.increaseNum;
+                                    dataPost.increasePoint = item.increasePoint;
+                                    dataPost.increaseUnit = item.increaseUnit;
+                                    dataPost.increaseDetail = item.increaseDetail;
+                                    dataPost.decreaseName = item.decreaseName;
+                                    dataPost.decreaseNum = item.decreaseNum;
+                                    dataPost.decreasePodet = item.decreasePodet;
+                                    dataPost.decreaseUnit = item.decreaseUnit;
+                                    dataPost.decreaseDetail = item.decreaseDetail;
+                                    dataPost.totalPoint = item.totalPoint;
+                                    dataPost.level = item.level;
+                                    dataPost.fatherId = fatherId;
 
-                        //提交该小条目
-                        dataPost.index_name = item.index_name;
-                        dataPost.increase_name = item.increase_name;
-                        dataPost.increase_num = item.increase_num;
-                        dataPost.increase_point = item.increase_point;
-                        dataPost.increase_unit = item.increase_unit;
-                        dataPost.increase_detail = item.increase_detail;
-                        dataPost.decrease_name = item.decrease_name;
-                        dataPost.decrease_num = item.decrease_num;
-                        dataPost.decrease_podet = item.decrease_podet;
-                        dataPost.decrease_unit = item.decrease_unit;
-                        dataPost.decrease_detail = item.decrease_detail;
-                        dataPost.total_point = item.total_point;
-                        dataPost.level = item.level;
-                        dataPost.father_id = father_id;
+                                    $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
+                                        if (response.data.status === 200) {
+                                            console.log('add okkkk');
+                                        } else {
+                                            $.notify(response.data.message, 'danger');
+                                        }
+                                    }, function (x) {
+                                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                    });
+                        }
 
-                        // $http.post('/url', dataPost).then(function (response) {
-                        //     if (response.data.status === 200) {
-                        //
-                        //     } else {
-                        //         $.notify(response.data.message, 'danger');
-                        //           break;
-                        //     }
-                        // }, function (x) {
-                        //     $.notify('服务器出了点问题，我们正在处理', 'danger');
-                        //     break;
-                        // });
-                        alert(dataPost.total_point + dataPost.submit_time);
+
+
+                        //alert("已提交");
                     }
 
                 });
@@ -263,18 +296,18 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         };
 
         $scope.reset = function (item) {
-            $scope.totalPoints -= item.total_point;
-            item.increase_num = "";
-            item.increase_detail = "";
-            item.decrease_num = "";
-            item.decrease_detail = "";
-            item.total_point = "";
+            $scope.totalPoints -= item.totalPoint;
+            item.increaseNum = "";
+            item.increaseDetail = "";
+            item.decreaseNum = "";
+            item.decreaseDetail = "";
+            item.totalPoint = "";
         };
         $scope.resetAll = function () {
             $scope.data.forEach(function (data_i, index) {
                 data_i.items.forEach(function (item) {
                     //对于总分是有效数字的条目
-                    if (!isNaN(item.total_point) && item.total_point !== "") {
+                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
                         $scope.reset(item);
                     }
                 });
@@ -282,7 +315,8 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         };
 
         //把日期格式2018/04/20替换为2018-04-20
-        $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g, '-');
+        // $scope.datePicked = (new Date()).toLocaleDateString().replace(/\//g, '-');
+        $scope.datePicked = moment().format('YYYY-MM-DD');
         //页面载入时日历是否自动打开
         $scope.opened = {
             start: false,
