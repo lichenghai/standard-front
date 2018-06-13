@@ -4,6 +4,7 @@
 
 App.controller('ResultController', ['$scope', '$http', '$rootScope', '$state', '$stateParams',
     function ($scope, $http, $rootScope, $state, $stateParams) {
+        $scope.standardDate = moment($stateParams.standardDate).format('YYYY年MM月DD日');
         var loadResults = function () {
 
             $http({
@@ -13,7 +14,7 @@ App.controller('ResultController', ['$scope', '$http', '$rootScope', '$state', '
                     standardDate: $stateParams.standardDate,
                     departmentId: $stateParams.departmentId,
                     personId: $rootScope.account.id,
-                    level:0,
+                    level: 0,
                 }
             })
                 .then(function (response) {
