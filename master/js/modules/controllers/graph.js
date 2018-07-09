@@ -2,28 +2,33 @@
  * Module: GraphController.js
  =========================================================*/
 
-App.controller('GraphController', ['$scope', '$http', '$rootScope',
+ App.controller('GraphController', ['$scope', '$http', '$rootScope',
     function ($scope, $http, $rootScope) {
         var chartData = {
             labels: [],
             datasets: [
-                {
-                    label: "My First dataset",
-                    fillColor: "rgba(151,187,205,0.2)",
-                    strokeColor: "rgba(151,187,205,1)",
-                    pointColor: "rgba(151,187,205,1)",
-                    pointStrokeColor: "#fff",
-                    pointHighlightFill: "#fff",
-                    pointHighlightStroke: "rgba(151,187,205,1)",
-                    data: []
-                },
+            {
+                label: "My First dataset",
+                fillColor: "rgba(151,187,205,0.2)",
+                strokeColor: "rgba(151,187,205,1)",
+                pointColor: "rgba(151,187,205,1)",
+                pointStrokeColor: "#fff",
+                pointHighlightFill: "#fff",
+                pointHighlightStroke: "rgba(151,187,205,1)",
+                data: []
+            },
             ]
         };
+
+
+         //默认查看最近30天的成绩
+                $scope.timeStart = moment().subtract(30, 'days').format('YYYY-MM-DD');
+            $scope.timeEnd = moment().format('YYYY-MM-DD');
         $scope.search = {
             personId: $rootScope.account.id,
-            departmentId: 0,
-            timeStart: '',
-            timeEnd: '',
+            departmentId: 4,
+            timeStart: $scope.timeStart,
+            timeEnd: $scope.timeEnd,
         };
         var chartOptions = {
             // ///Boolean - Whether grid lines are shown across the chart
@@ -79,59 +84,89 @@ App.controller('GraphController', ['$scope', '$http', '$rootScope',
 
         myNewChart.Line(chartData, chartOptions);
         var
-            buildParam = function () {
-                var param = {
-                    method: 'GET',
-                    url: $rootScope.url + '/standard-service/statics/search',
-                    params: $scope.search
-                };
-                return param;
-            }, loadData = function () {
-                $http(buildParam())
-                    .then(function (response) {
-                        if (response.data.status === 200) {
-                            $scope.data = response.data.data;
-                            $scope.data.forEach(function (data_i, index,array) {
-                                chartData.labels.push(moment(data_i.recordDate).format('YYYY-MM-DD'));
-                                chartData.datasets[0].data.push(data_i.score);
-                                if(index==array.length-1){
-                                    console.log("chartData:"+JSON.stringify(chartData));
-                                    myNewChart.Line(chartData, chartOptions);
-
-                                }
-                            });
-                        } else {
-                            $.notify(response.data.message, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
-            },            resetList = function () {
-                if (!!$scope.timeStart) {
-                    var date = new Date($scope.timeStart);
-                    $scope.search.timeStart = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
-                }
-
-                if (!!$scope.timeEnd) {
-                    var date = new Date($scope.timeEnd);
-                    $scope.search.timeEnd = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59';
-                }
-
-                loadData();
-            }, loadRelations = function () {
-                $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
-                    .then(function (response) {
-                        if (response.data.status === 200) {
-                            $scope.relations = response.data.data;
-                            $scope.department = $scope.relations[0];
-                            loadIndex();
-                        } else {
-                            $.notify(response.data.message, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
+        buildParam = function () {
+            var param = {
+                method: 'GET',
+                url: $rootScope.url + '/standard-service/statics/search',
+                params: $scope.search
             };
+            return param;
+        }, 
+        loadData = function () {
+            $http(buildParam())
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.data = response.data.data;
+                    $scope.data.forEach(function (data_i, index,array) {
+                        chartData.labels.push(moment(data_i.recordDate).format('YYYY-MM-DD'));
+                        chartData.datasets[0].data.push(data_i.score);
+                        if(index==array.length-1){
+                            console.log("chartData:"+JSON.stringify(chartData));
+                            myNewChart.Line(chartData, chartOptions);
+
+                        }
+                    });
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
+        },            
+        resetList = function () {
+            if (!!$scope.timeStart) {
+                var date = new Date($scope.timeStart);
+                $scope.search.timeStart = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
+            }
+
+            if (!!$scope.timeEnd) {
+                var date = new Date($scope.timeEnd);
+                $scope.search.timeEnd = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59';
+            }
+
+            loadData();
+        }, 
+        loadRelations = function () {
+            $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.relations = response.data.data;
+                    $scope.department = $scope.relations[0];
+                    loadIndex();
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
+        };
+        var loadIndex = function () {
+
+            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
+                .then(function (response) {
+                    if (response.data.status === 200) {
+                        $scope.data = response.data.data;
+                        $scope.data.forEach(function (item) {
+                            $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
+                                .then(function (response) {
+                                    if (response.data.status === 200) {
+                                        item['items'] = response.data.data;
+                                    } else {
+                                        $.notify(response.data.message, 'danger');
+                                    }
+                                }, function (x) {
+                                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                                });
+                        })
+                    } else {
+                        $.notify(response.data.message, 'danger');
+                    }
+                }, function (x) {
+                    $.notify('服务器出了点问题，我们正在处理', 'danger');
+                });
+            }
+
+
         $scope.searchList = resetList;
         $scope.resetSearch = function () {
             $scope.search.departmentId = 0;
@@ -167,13 +202,10 @@ App.controller('GraphController', ['$scope', '$http', '$rootScope',
                  standard_date: "2018-04-29",
                  total_point: 90,
              },
-         ];*/
+             ];*/
 
 
-
-        $scope.timeStart = '';
-        $scope.timeEnd = '';
-        $scope.opened = {
+         $scope.opened = {
             start: false,
             end: false
         };
