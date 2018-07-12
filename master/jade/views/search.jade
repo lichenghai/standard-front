@@ -20,7 +20,7 @@ h3 绩效检索
                             tbody(ng-repeat='item in items')
                                 tr
                                     td {{$index+1}}
-                                    td {{item.standardDate | date:'yyyy-MM-dd':'UTC'}}
+                                    td {{item.standardDate | date:'yyyy-MM-dd'}}
                                     td {{item.indexName}}
                                     td {{item.totalPoint}}
                                     td {{item.leaderName}}：{{item.leaderComment}}
