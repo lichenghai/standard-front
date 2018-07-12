@@ -20,7 +20,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         }
         var loadIndex = function () {
 
-            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
+            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.departmentId + '&level=0')
                 .then(function (response) {
                     if (response.data.status === 200) {
                         $scope.data = response.data.data;

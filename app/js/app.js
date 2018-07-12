@@ -467,7 +467,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         }
         var loadIndex = function () {
 
-            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
+            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.departmentId + '&level=0')
                 .then(function (response) {
                     if (response.data.status === 200) {
                         $scope.data = response.data.data;
@@ -819,10 +819,10 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         };
 
 
-         //默认查看最近30天的成绩
-                $scope.timeStart = moment().subtract(30, 'days').format('YYYY-MM-DD');
-            $scope.timeEnd = moment().format('YYYY-MM-DD');
-        $scope.search = {
+         //默认查看最近30天的成绩,部门为 管理处
+         $scope.timeStart = moment().subtract(30, 'days').format('YYYY-MM-DD');
+         $scope.timeEnd = moment().format('YYYY-MM-DD');
+         $scope.search = {
             personId: $rootScope.account.id,
             departmentId: 4,
             timeStart: $scope.timeStart,
@@ -941,28 +941,28 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         var loadIndex = function () {
 
             $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
-                .then(function (response) {
-                    if (response.data.status === 200) {
-                        $scope.data = response.data.data;
-                        $scope.data.forEach(function (item) {
-                            $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
-                                .then(function (response) {
-                                    if (response.data.status === 200) {
-                                        item['items'] = response.data.data;
-                                    } else {
-                                        $.notify(response.data.message, 'danger');
-                                    }
-                                }, function (x) {
-                                    $.notify('服务器出了点问题，我们正在处理', 'danger');
-                                });
-                        })
-                    } else {
-                        $.notify(response.data.message, 'danger');
-                    }
-                }, function (x) {
-                    $.notify('服务器出了点问题，我们正在处理', 'danger');
-                });
-            }
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    $scope.data = response.data.data;
+                    $scope.data.forEach(function (item) {
+                        $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
+                        .then(function (response) {
+                            if (response.data.status === 200) {
+                                item['items'] = response.data.data;
+                            } else {
+                                $.notify(response.data.message, 'danger');
+                            }
+                        }, function (x) {
+                            $.notify('服务器出了点问题，我们正在处理', 'danger');
+                        });
+                    })
+                } else {
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
+        }
 
 
         $scope.searchList = resetList;
@@ -1003,21 +1003,21 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
              ];*/
 
 
-         $scope.opened = {
-            start: false,
-            end: false
-        };
+             $scope.opened = {
+                start: false,
+                end: false
+            };
 
-        $scope.open = function ($event, attr) {
-            $event.preventDefault();
-            $event.stopPropagation();
+            $scope.open = function ($event, attr) {
+                $event.preventDefault();
+                $event.stopPropagation();
 
-            $scope.opened[attr] = true;
-        };
+                $scope.opened[attr] = true;
+            };
 
-        resetList();
-        loadRelations();
-    }]);
+            resetList();
+            loadRelations();
+        }]);
 
 /**=========================================================
  * Module: main.js
