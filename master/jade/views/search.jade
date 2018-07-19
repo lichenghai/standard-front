@@ -23,9 +23,10 @@ h3 绩效检索
                                     td {{item.standardDate | date:'yyyy-MM-dd'}}
                                     td {{item.indexName}}
                                     td {{item.totalPoint}}
-                                    td {{item.leaderName}}：{{item.leaderComment}}
                                     td
-                                        button.btn.btn-link(type='button', ng-click='alert("id:"+item.id)')
+                                        p(ng-repeat='leadercomment in item.leadercomment')  {{leadercomment.username}}：{{leadercomment.commentContent}}
+                                    td
+                                        button.btn.btn-link(type='button', ng-click='showCurrentDay(item)')
                                             span 查看当日
                             tfoot
                                 tr(ng-if='results.length===0')
