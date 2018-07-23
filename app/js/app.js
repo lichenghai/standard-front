@@ -558,6 +558,16 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             var submitTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
             $scope.data.forEach(function (data_i, index0, array0) {
+
+                //先判断大条目下是否有有效内容，没有的话就不提交
+                var hasValue = false;
+                data_i.items.forEach(function (item, index1, array1) {
+                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
+                        hasValue = true;
+                    }
+                });
+                if (hasValue){
+
                     if (index0 == array0.length - 1) check0 = true;
                     check1 = false;
                     var data0 = {};
@@ -644,7 +654,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                         });
 
                 }
-            )
+            })
         }
 
 //每个条目不同的部分
@@ -818,16 +828,15 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             ]
         };
 
-
-         //默认查看最近30天的成绩,部门为 管理处
+         //默认查看最近30天的成绩
          $scope.timeStart = moment().subtract(30, 'days').format('YYYY-MM-DD');
          $scope.timeEnd = moment().format('YYYY-MM-DD');
          $scope.search = {
-            personId: $rootScope.account.id,
-            departmentId: 4,
             timeStart: $scope.timeStart,
             timeEnd: $scope.timeEnd,
+            personId: $rootScope.account.id,
         };
+
         var chartOptions = {
             // ///Boolean - Whether grid lines are shown across the chart
             scaleShowGridLines: true,
@@ -878,40 +887,33 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         // Get context with jQuery - using jQuery's .get() method.
         var ctx = $("#myChart").get(0).getContext("2d");
         // This will get the first returned node in the jQuery collection.
-        var myNewChart = new Chart(ctx);
+        var myNewChart = new Chart(ctx).Line(chartData, chartOptions);
 
-        myNewChart.Line(chartData, chartOptions);
-        var
-        buildParam = function () {
+        var buildParam = function () {
             var param = {
                 method: 'GET',
-                url: $rootScope.url + '/standard-service/statics/search',
+                url: $rootScope.url + '/standard-service/statics/search', //查找其下属人员的成绩
                 params: $scope.search
             };
             return param;
-        }, 
-        loadData = function () {
-            $http(buildParam())
+        }; 
+
+        var loadRelations = function () {
+            $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
             .then(function (response) {
                 if (response.data.status === 200) {
-                    $scope.data = response.data.data;
-                    $scope.data.forEach(function (data_i, index,array) {
-                        chartData.labels.push(moment(data_i.recordDate).format('YYYY-MM-DD'));
-                        chartData.datasets[0].data.push(data_i.score);
-                        if(index==array.length-1){
-                            console.log("chartData:"+JSON.stringify(chartData));
-                            myNewChart.Line(chartData, chartOptions);
-
-                        }
-                    });
+                    $scope.relations = response.data.data;
+                    $scope.search.departmentId = $scope.relations[0].departmentId;
+                    $scope.loadData();
                 } else {
                     $.notify(response.data.message, 'danger');
                 }
             }, function (x) {
                 $.notify('服务器出了点问题，我们正在处理', 'danger');
             });
-        },            
-        resetList = function () {
+        }
+
+        $scope.loadData = function () {
             if (!!$scope.timeStart) {
                 var date = new Date($scope.timeStart);
                 $scope.search.timeStart = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
@@ -922,102 +924,56 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                 $scope.search.timeEnd = date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59';
             }
 
-            loadData();
-        }, 
-        loadRelations = function () {
-            $http.get($rootScope.url + '/account-service/relations/list?personId=' + $rootScope.account.id)
+            $http(buildParam())
             .then(function (response) {
                 if (response.data.status === 200) {
-                    $scope.relations = response.data.data;
-                    $scope.department = $scope.relations[0];
-                    loadIndex();
-                } else {
-                    $.notify(response.data.message, 'danger');
-                }
-            }, function (x) {
-                $.notify('服务器出了点问题，我们正在处理', 'danger');
-            });
+
+                    //清空之前的
+                    chartData.labels = [];
+                    chartData.datasets[0].data = [];         
+
+                    $scope.data = response.data.data;   
+
+                    //填写人名标签
+                    chartData.datasets[0].label = $rootScope.account.username;
+
+                    //填写数据集
+                    $scope.data.forEach(function (data_i) {
+                        chartData.labels.push(moment(data_i.recordDate).format('YYYY-MM-DD'));
+                        chartData.datasets[0].data.push(data_i.score);
+                    });
+                    console.log("chartData:"+JSON.stringify(chartData));
+                            // myNewChart.Line(chartData, chartOptions);
+                    // myNewChart.clear();
+                    //先移除原先画布，再重画，否则会出现重叠。
+                    $('#myChart').remove();
+                    $('#container').append('<canvas id="myChart" style="width:1000px"></canvas>');
+                    ctx = $("#myChart").get(0).getContext("2d");
+                    myNewChart = new Chart(ctx).Line(chartData, chartOptions);
+                } 
+                else {
+                            $.notify(response.data.message, 'danger');
+                        }
+                    }, function (x) {
+                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                    });
+        };            
+
+        $scope.opened = {
+            start: false,
+            end: false
         };
-        var loadIndex = function () {
 
-            $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.id + '&level=0')
-            .then(function (response) {
-                if (response.data.status === 200) {
-                    $scope.data = response.data.data;
-                    $scope.data.forEach(function (item) {
-                        $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
-                        .then(function (response) {
-                            if (response.data.status === 200) {
-                                item['items'] = response.data.data;
-                            } else {
-                                $.notify(response.data.message, 'danger');
-                            }
-                        }, function (x) {
-                            $.notify('服务器出了点问题，我们正在处理', 'danger');
-                        });
-                    })
-                } else {
-                    $.notify(response.data.message, 'danger');
-                }
-            }, function (x) {
-                $.notify('服务器出了点问题，我们正在处理', 'danger');
-            });
-        }
+        $scope.open = function ($event, attr) {
+            $event.preventDefault();
+            $event.stopPropagation();
 
-
-        $scope.searchList = resetList;
-        $scope.resetSearch = function () {
-            $scope.search.departmentId = 0;
-            $scope.search.timeStart = '';
-            $scope.search.timeEnd = '';
-            $scope.timeStart = '';
-            $scope.timeEnd = '';
-            resetList();
+            $scope.opened[attr] = true;
         };
-        //***需要替换为从后台获取的数据***
-        /* $scope.data = [
-             {
-                 standard_date: "2018-04-24",
-                 total_point: 60,
-             },
-             {
-                 standard_date: "2018-04-25",
-                 total_point: 100,
-             },
-             {
-                 standard_date: "2018-04-26",
-                 total_point: 80,
-             },
-             {
-                 standard_date: "2018-04-27",
-                 total_point: 100,
-             },
-             {
-                 standard_date: "2018-04-28",
-                 total_point: 70,
-             },
-             {
-                 standard_date: "2018-04-29",
-                 total_point: 90,
-             },
-             ];*/
 
+        loadRelations();
+    }]);
 
-             $scope.opened = {
-                start: false,
-                end: false
-            };
-
-            $scope.open = function ($event, attr) {
-                $event.preventDefault();
-                $event.stopPropagation();
-
-                $scope.opened[attr] = true;
-            };
-
-            resetList();
-            loadRelations();
-        }]);
 
 /**=========================================================
  * Module: main.js
@@ -1176,97 +1132,93 @@ App.controller('ResultController', ['$scope', '$http', '$rootScope', '$state', '
  * Module: SearchController.js
  =========================================================*/
 
-App.controller('SearchController', ['$scope', '$http', '$rootScope',
+ App.controller('SearchController', ['$scope', '$http', '$rootScope',
     function ($scope, $http, $rootScope) {
 
         $rootScope.IncreaseTypeList = [{
             key: 0,
             value:"全部"
         },
-            {
-                key:1,
-                value: "仅显示扣分"
-            },
-            {
-                key:2,
-                value: "仅显示得分"
-            }
+        {
+            key:1,
+            value: "仅显示扣分"
+        },
+        {
+            key:2,
+            value: "仅显示得分"
+        }
         ];
 
         $rootScope.CommentTypeList = [{
             key: 0,
             value:"全部"
         },
-            {
-                key:1,
-                value: "仅显示含评语结果"
-            },
-            {
-                key:2,
-                value: "仅显示无评语结果"
-            }
+        {
+            key:1,
+            value: "仅显示含评语结果"
+        },
+        {
+            key:2,
+            value: "仅显示无评语结果"
+        }
         ];
 
+        $scope.timeStart = moment().subtract(7, 'days').format('YYYY-MM-DD')
+        $scope.timeEnd = moment().format('YYYY-MM-DD');
+        // $scope.timeStart = '';
+        // $scope.timeEnd = '';
+        //默认为最近一周的成绩
         $scope.search = {
             increaseType: 0,
             commentType: 0,
             timeStart: '',
             timeEnd: '',
             page: 1,
-            size: 2
+            size: 10,
+            personId: $rootScope.account.id
         };
-        $scope.timeStart = '';
-        $scope.timeEnd = '';
+
         $scope.opened = {
             start: false,
             end: false
         };
 
-        var
-            buildParam = function () {
-                var param = {
-                    method: 'GET',
-                    url:$rootScope.url+'/standard-service/result/search',
-                    params: $scope.search
-                };
-                return param;
-            },
-            loadData = function () {
-                $http(buildParam())
-                    .then(function (response) {
-                        if (response.data.status === 200) {
-                            $scope.items = response.data.data.list;
-                            $scope.totalItems = response.data.data.total;
-                        } else {
-                            $.notify(response.data.message, 'danger');
-                        }
-                    }, function (x) {
-                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                    });
-            },
-            resetList = function () {
-                $scope.search.page = 1;
-
-
-                if (!!$scope.timeStart) {
-                    var date = new Date($scope.timeStart);
-                    $scope.search.timeStart=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
+        var buildParam = function () {
+            var param = {
+                method: 'GET',
+                url:$rootScope.url+'/standard-service/result/search',
+                params: $scope.search
+            };
+            return param;
+        };
+        $scope.loadData = function () {
+            if (!!$scope.timeStart) {
+                var date = new Date($scope.timeStart);
+                $scope.search.timeStart=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 00:00:00';
 
                   //  $scope.search.timeStart = $scope.timeStart + ' 00:00:00';
+              }
+
+              if (!!$scope.timeEnd) {
+                var date = new Date($scope.timeEnd);
+                $scope.search.timeEnd=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59' ;
+
+               // $scope.search.timeEnd = $scope.timeEnd + ' 23:59:59';
+           }
+           $http(buildParam())
+           .then(function (response) {
+            if (response.data.status === 200) {
+                $scope.items = response.data.data.list;
+                $scope.totalItems = response.data.data.total;
+
+                } else {
+                    $.notify(response.data.message, 'danger');
                 }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
+       };
 
-                if (!!$scope.timeEnd) {
-                    var date = new Date($scope.timeEnd);
-                    $scope.search.timeEnd=date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate() + ' 23:59:59' ;
-
-                   // $scope.search.timeEnd = $scope.timeEnd + ' 23:59:59';
-                }
-
-                loadData();
-            };
-
-        $scope.pageChanged = loadData;
-        $scope.searchList = resetList;
         $scope.dateOptions = {
             datepickerMode: 'year',
             formatYear: 'yyyy',
@@ -1281,23 +1233,13 @@ App.controller('SearchController', ['$scope', '$http', '$rootScope',
             $scope.opened[attr] = true;
         };
 
-        $scope.resetSearch = function () {
-            $scope.totalItems = 0;
-            $scope.search.commentType = 0;
-            $scope.search.timeStart = '';
-            $scope.search.timeEnd = '';
-            $scope.timeStart = '';
-            $scope.timeEnd = '';
-            resetList();
-        };
-
         $(window).resize(function () {
             var d = $('#container');
             d.height($(window).height() - d.offset().top);
         });
         $(window).resize();
 
-        resetList();
+        $scope.loadData();
     }]);
 
 /**=========================================================

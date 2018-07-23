@@ -111,6 +111,16 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             var submitTime = moment().format('YYYY-MM-DD HH:mm:ss');
 
             $scope.data.forEach(function (data_i, index0, array0) {
+
+                //先判断大条目下是否有有效内容，没有的话就不提交
+                var hasValue = false;
+                data_i.items.forEach(function (item, index1, array1) {
+                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
+                        hasValue = true;
+                    }
+                });
+                if (hasValue){
+
                     if (index0 == array0.length - 1) check0 = true;
                     check1 = false;
                     var data0 = {};
@@ -197,7 +207,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                         });
 
                 }
-            )
+            })
         }
 
 //每个条目不同的部分
