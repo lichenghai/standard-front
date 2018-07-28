@@ -23,10 +23,11 @@ style.
                     .form-group.text-right
                 label.form-inline 日期：
                     .input-group
-                        input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true')
+                        input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true', ng-change='checkSubmition()')
                         span.input-group-btn
                             button.btn.btn-default(type='button', ng-click='open($event, "start")')
                                 em.fa.fa-calendar
+                label(ng-show="submitted" style='color:red') 今日已提交！
         hr
         .col-lg-12(style='background-color:white')        
             .form-group(ng-repeat='data_i in data')
@@ -80,6 +81,6 @@ style.
             hr
             .row
                 .col-lg-12.text-center
-                    button.btn.btn-success(type='button', ng-click='submit()') 提交
-                    button.btn.btn-default(type='button', ng-click='resetAll()') 重置
+                    button.btn.btn-success(type='button', ng-click='submit()', ng-disabled='submitted') 提交
+                    button.btn.btn-default(type='button', ng-click='resetAll()', ng-disabled='submitted') 重置
     

@@ -19,7 +19,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                 });
         }
         var loadIndex = function () {
-
+            $scope.checkSubmition();
             $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.departmentId + '&level=0')
                 .then(function (response) {
                     if (response.data.status === 200) {
@@ -45,7 +45,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         }
 
         $scope.changeDepartment = loadIndex;
-
+        $scope.submitted = false;
         $scope.totalPoints = 0;
 
         $scope.operate = function (item, index, step) {
@@ -104,25 +104,20 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                 //         $.notify('服务器出了点问题，我们正在处理', 'danger');
                 //     });
             };
-
         $scope.submit = function () {
-            var check0 = false, check1 = false;
-            var standardDate = moment($scope.datePicked).format('YYYY-MM-DD');
+            var postData = [];
             var submitTime = moment().format('YYYY-MM-DD HH:mm:ss');
-
+            var standardDate = moment($scope.datePicked).format('YYYY-MM-DD');
             $scope.data.forEach(function (data_i, index0, array0) {
-
                 //先判断大条目下是否有有效内容，没有的话就不提交
                 var hasValue = false;
-                data_i.items.forEach(function (item, index1, array1) {
+                data_i.items.forEach(function (item) {
                     if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
                         hasValue = true;
+                        // break;
                     }
                 });
                 if (hasValue){
-
-                    if (index0 == array0.length - 1) check0 = true;
-                    check1 = false;
                     var data0 = {};
                     data0['personId'] = $rootScope.account.id;
                     data0['departmentId'] = $scope.department.departmentId;
@@ -132,183 +127,123 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                     data0['fatherId'] = 0;
                     data0['standardDate'] = standardDate;
                     data0['submitTime'] = submitTime;
-                    $http
+                    postData.push(data0);
+
+                    data_i.items.forEach(function (item, index1, array1) {
+                        if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
+                            var data1 = {};
+                            data1['indexName'] = item.indexName;
+                            data1['departmentId'] = $scope.department.departmentId;
+                            data1['departmentName'] = $scope.department.departmentName;
+                            data1['personId'] = $rootScope.account.id;
+
+                            data1['increaseName'] = item.increaseName;
+                            data1['increasePoint'] = item.increasePoint;
+                            data1['increaseUnit'] = item.increaseUnit;
+                            data1['increaseNum'] = item.increaseNum;
+                            data1['increaseDetail'] = item.increaseDetail;
+
+                            data1['decreaseName'] = item.decreaseName;
+                            data1['decreasePoint'] = item.decreasePoint;
+                            data1['decreaseUnit'] = item.decreaseUnit;
+                            data1['decreaseNum'] = item.decreaseNum;
+                            data1['decreaseDetail'] = item.decreaseDetail;
+
+                            data1['totalPoint'] = item.totalPoint;
+                            data1['level'] = 1;
+
+                            data1['standardDate'] = standardDate;
+                            data1['submitTime'] = submitTime;
+
+                            postData.push(data1);
+                        }
+                    });
+                }
+            });
+
+            if (postData.length==0){
+                $.notify('请勿提交空表', 'danger');
+            }
+            else{
+                $http
                     ({
                         method: 'POST',
-                        url: $rootScope.url + '/standard-service/result/add',
-                        data: data0
+                        url: $rootScope.url + '/standard-service/result/add-batch',
+                        data: postData
                     })
-                        .then(function (response) {
-                            if (response.data.status != 200) {
-                                //reject(JSON.stringify(response));
-                                if (index0 == array0.length - 1) check0 = true;
-
-                                $.notify(response.data.message, 'danger');
-                            } else {
-                                data_i.items.forEach(function (item, index1, array1) {
-                                    if (index1 == array1.length - 1) check1 = true;
-                                    if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
-                                        var data1 = {};
-                                        data1['indexName'] = item.indexName;
-                                        data1['departmentId'] = $scope.department.departmentId;
-                                        data1['departmentName'] = $scope.department.departmentName;
-                                        data1['personId'] = $rootScope.account.id;
-
-                                        data1['increaseName'] = item.increaseName;
-                                        data1['increasePoint'] = item.increasePoint;
-                                        data1['increaseUnit'] = item.increaseUnit;
-                                        data1['increaseNum'] = item.increaseNum;
-                                        data1['increaseDetail'] = item.increaseDetail;
-
-                                        data1['decreaseName'] = item.decreaseName;
-                                        data1['decreasePoint'] = item.decreasePoint;
-                                        data1['decreaseUnit'] = item.decreaseUnit;
-                                        data1['decreaseNum'] = item.decreaseNum;
-                                        data1['decreaseDetail'] = item.decreaseDetail;
-
-                                        data1['totalPoint'] = item.totalPoint;
-                                        data1['level'] = 1;
-                                        data1['fatherId'] = response.data.data.id;
-
-                                        data1['standardDate'] = standardDate;
-                                        data1['submitTime'] = submitTime;
-                                        $http
-                                        ({
-                                            method: 'POST',
-                                            url: $rootScope.url + '/standard-service/result/add',
-                                            data: data1
-                                        })
-                                            .then(function (response1) {
-                                                if (index1 == array1.length - 1) check1 = true;
-                                                if (response1.data.status != 200) {
+                    .then(function (response) {
+                        if (response.data.status != 200) {
+                            $.notify(response.data.message, 'danger');
+                        } else {
+                            // data1['fatherId'] = response.data.data.id;
+                            //获取这波提交的内容，update小条目的fatherId
+                            $http.get($rootScope.url + '/standard-service/result/list?submitTime' + submitTime)
+                            .then(function (response) {
+                                if (response.data.status === 200) {
+                                    var fatherId = 0;
+                                    response.data.data.forEach(function(item, index, array){
+                                        if (item.level === 0){
+                                            fatherId = item.id;
+                                        }
+                                        else {
+                                            item.fatherId = fatherId;
+                                            $http
+                                            ({
+                                                method: 'POST',
+                                                url: $rootScope.url + '/standard-service/result/edit',
+                                                data: item
+                                            })
+                                            .then(function (response) {
+                                                if (response.data.status != 200) {
                                                     $.notify(response.data.message, 'danger');
-                                                } else if (check0 && check1) {
+                                                } else if(index === array.length-1){
+                                                    $.notify('提交成功！', 'success');
                                                     $state.go('app.result', {
                                                         standardDate:standardDate,
                                                         departmentId: $scope.department.departmentId
                                                     });
                                                 }
-                                            }, function (x) {
-                                                $.notify('服务器出了点问题，我们正在处理', 'danger');
                                             });
-                                    } else if (check0 && check1) {
-                                        $state.go('app.result');
-                                        $state.go('app.result', {
-                                            standardDate:standardDate,
-                                            departmentId: $scope.department.departmentId
-                                        });
-                                    }
-                                })
+                                        }
+                                    });
+                                } else {
+                                    $.notify(response.data.message, 'danger');
+                                }
+                            }, function (x) {
+                                $.notify('服务器出了点问题，我们正在处理', 'danger');
+                            });
 
-                            }
-                            ;
-                        }, function (x) {
-                            $.notify('服务器出了点问题，我们正在处理', 'danger');
-                        });
 
-                }
-            })
+
+                        }
+                    }, function (x) {
+                        $.notify('服务器出了点问题，我们正在处理', 'danger');
+                    });
+            }
         }
 
-//每个条目不同的部分
-//对于每个大项
-        /*            $scope.data.forEach(function (data_i, index) {
-
-                        var fatherId = 0;
-                        var hasFatherId = false;
-                        //对于每个小条目。必须直接遍历小条目，因为有的大项里面没有任何有效记录，就不能加入。
-                        data_i.items.forEach(function (item, index) {
-                            //对于总分是有效数字的条目
-                            if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
-                                //如果大项还没加入过，先提交大项条目，获取fatherId
-                                if (!hasFatherId) {
-                                    dataPost.indexName = data_i.indexName;
-                                    dataPost.level = data_i.level;
-                                    dataPost.fatherId = 0;
-                                    console.log(JSON.stringify(dataPost));
-                                    $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
-                                        if (response.data.status === 200) {
-
-                                            fatherId = response.data.data.id;
-                                            console.log('add level 0 fatherID=' + fatherId);
-
-                                            //提交该小条目。放到这里面是为了配合异步传输机制。
-                                            dataPost.indexName = item.indexName;
-                                            dataPost.increaseName = item.increaseName;
-                                            dataPost.increaseNum = item.increaseNum;
-                                            dataPost.increasePoint = item.increasePoint;
-                                            dataPost.increaseUnit = item.increaseUnit;
-                                            dataPost.increaseDetail = item.increaseDetail;
-                                            dataPost.decreaseName = item.decreaseName;
-                                            dataPost.decreaseNum = item.decreaseNum;
-                                            dataPost.decreasePodet = item.decreasePodet;
-                                            dataPost.decreaseUnit = item.decreaseUnit;
-                                            dataPost.decreaseDetail = item.decreaseDetail;
-                                            dataPost.totalPoint = item.totalPoint;
-                                            dataPost.level = item.level;
-                                            dataPost.fatherId = fatherId;
-
-                                            $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
-                                                if (response.data.status === 200) {
-                                                    console.log('add okkkk');
-                                                } else {
-                                                    $.notify(response.data.message, 'danger');
-                                                }
-                                            }, function (x) {
-                                                $.notify('服务器出了点问题，我们正在处理', 'danger');
-                                            });
-
-                                        } else {
-                                            $.notify(response.data.message, 'danger');
-                                        }
-                                    }, function (x) {
-                                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                                    });
-                                    hasFatherId = true;
-                                    postFlag = true;
-                                }
-                                //已经有了fatherId
-                                else {
-                                    //直接提交该小条目
-                                    dataPost.indexName = item.indexName;
-                                    dataPost.increaseName = item.increaseName;
-                                    dataPost.increaseNum = item.increaseNum;
-                                    dataPost.increasePoint = item.increasePoint;
-                                    dataPost.increaseUnit = item.increaseUnit;
-                                    dataPost.increaseDetail = item.increaseDetail;
-                                    dataPost.decreaseName = item.decreaseName;
-                                    dataPost.decreaseNum = item.decreaseNum;
-                                    dataPost.decreasePodet = item.decreasePodet;
-                                    dataPost.decreaseUnit = item.decreaseUnit;
-                                    dataPost.decreaseDetail = item.decreaseDetail;
-                                    dataPost.totalPoint = item.totalPoint;
-                                    dataPost.level = item.level;
-                                    dataPost.fatherId = fatherId;
-
-                                    $http.post($rootScope.url + '/standard-service/result/add', dataPost).then(function (response) {
-                                        if (response.data.status === 200) {
-                                            console.log('add okkkk');
-                                        } else {
-                                            $.notify(response.data.message, 'danger');
-                                        }
-                                    }, function (x) {
-                                        $.notify('服务器出了点问题，我们正在处理', 'danger');
-                                    });
-                                }
-
-
-                                //alert("已提交");
-                            }
-
-                        });
-                    });
-                    if (postFlag) {
-                        $state.go('app.result');
+        $scope.checkSubmition = function(){
+            //查询当前日期是否已有记录
+            var standardDate = moment($scope.datePicked).format('YYYY-MM-DD');
+            $http.get($rootScope.url + '/standard-service/result/list?standardDate=' + standardDate 
+                + '&personId=' + $rootScope.account.id 
+                + '&departmentId=' + $scope.department.departmentId)
+            .then(function (response) {
+                if (response.data.status === 200) {
+                    if (response.data.data.length > 0){
+                        $scope.submitted = true;
                     }
-                    else {
-                        $.notify('填写内容为空', 'danger');
+                    else{
+                        $scope.submitted = false;
                     }
-                };*/
+                }
+                else{
+                    $.notify(response.data.message, 'danger');
+                }
+            }, function (x) {
+                $.notify('服务器出了点问题，我们正在处理', 'danger');
+            });
+        }
 
         $scope.reset = function (item) {
             $scope.totalPoints -= item.totalPoint;
