@@ -29,6 +29,8 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                                 .then(function (response) {
                                     if (response.data.status === 200) {
                                         item['items'] = response.data.data;
+                                        //开启导航
+                                        $('#nav').onePageNav();
                                     } else {
                                         $.notify(response.data.message, 'danger');
                                     }
@@ -291,5 +293,6 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         });
         $(window).resize();
         loadRelations();
+
     }])
 ;

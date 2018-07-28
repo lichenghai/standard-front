@@ -101,7 +101,8 @@ App
             'ueditor': ['vendor/ueditor/ueditor.config.js',
                 'vendor/ueditor/ueditor.all.min.js'],
             'qiniu-js-sdk': ['vendor/qiniu-js-sdk/qiniu.js',
-                'vendor/qiniu-js-sdk/plupload/plupload.full.min.js']
+                'vendor/qiniu-js-sdk/plupload/plupload.full.min.js'],
+            'jquery-nav-js':['vendor/jquery.nav.js/jquery.nav.js']
         },
         // Angular based script (use the right module name)
         modules: [

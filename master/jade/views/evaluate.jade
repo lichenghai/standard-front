@@ -9,6 +9,81 @@ style.
     input {
         text-align:center;
     }
+
+    .section-wrapper {
+
+        margin-top: -50px;
+
+        padding-top: 50px;
+
+    }
+
+
+
+    .section-wrapper:first-child .section {
+
+        padding-top: 100px;
+
+    }
+
+
+
+    #nav {
+
+        left: 0;
+
+        list-style: none;
+
+        overflow: hidden;
+
+        position: fixed;
+
+        right: 0;
+
+        text-align: center;
+
+        top: 0;
+
+    }
+
+    #nav li {
+
+        display: inline-block;
+
+        margin-bottom: 0;
+
+    }
+
+    #nav a {
+
+        background: #fff;
+
+        color: #000;
+
+        display: block;
+
+        padding: 10px;
+
+    }
+
+    #nav a:hover {
+
+        background: none;
+
+        color: #098ed6;
+
+    }
+
+    #nav .current a {
+
+        background: #000;
+
+        color: #fff;
+
+    }
+
+
+
 #container.row(style='overflow-y: scroll')
     .col-lg-12
         .row
@@ -27,52 +102,56 @@ style.
                         span.input-group-btn
                             button.btn.btn-default(type='button', ng-click='open($event, "start")')
                                 em.fa.fa-calendar
-                label(ng-show="submitted" style='color:red') 今日已提交！
+                label(ng-show="submitted", style='color:red') 今日已提交！
         hr
-        .col-lg-12(style='background-color:white')        
+        ul#nav
+            li(ng-repeat='data_i in data') 
+                a(href="#/app/evaluate#section{{data_i.id}}") {{data_i.indexName}}
+        .col-lg-12(style='background-color:white').tableContainer        
             .form-group(ng-repeat='data_i in data')
                 // START table-responsive
-                h4(style="text-align:center") {{data_i.indexName}}
-                .table-responsive
-                    table.table.table-bordered.table-condensed.table-hover
-                        thead
-                            tr
-                                th.col-sm-1 序号
-                                th.col-sm-1 指标名称 
-                                th.col-sm-1 加分内容
-                                th.col-sm-2 数量
-                                th.col-sm-1 加分情况说明
-                                th.col-sm-1 减分内容
-                                th.col-sm-2 数量
-                                th.col-sm-1 减分情况说明
-                                th.col-sm-1 得分
-                                th.col-sm-1 操作
-                        tbody(ng-repeat='item in data_i.items')
-                            tr
-                                td {{$index+1}}
-                                td {{item.indexName}}
-                                td {{item.increaseName}}({{item.increasePoint}}分/{{item.increaseUnit}})
-                                td 
-                                    button.btn(ng-click="operate(item, 0, -1)") 
-                                        i.fa.fa-minus
-                                    input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="item.increaseNum")
-                                    button.btn(ng-click="operate(item, 0, 1)")
-                                        i.fa.fa-plus
-                                td 
-                                    input(style="text-align: center;" type="text" placeholder="" ng-model="item.increaseDetail")
-                                td {{item.decreaseName}}(-{{item.decreasePoint}}分/{{item.decreaseUnit}})
-                                td 
-                                    button.btn(ng-click="operate(item, 1, -1)") 
-                                        i.fa.fa-minus
-                                    input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="item.decreaseNum")
-                                    button.btn(ng-click="operate(item, 1, 1)")
-                                        i.fa.fa-plus
-                                td 
-                                    input(style="text-align: center;" type="text" placeholder="" ng-model="item.decreaseDetail")
-                                td {{item.totalPoint}}
-                                td
-                                    button.btn.btn-link(type='button', ng-click='reset(item)')
-                                        span 清空
+                div(id='section{{data_i.id}}').section
+                    h4(style="text-align:center") {{data_i.indexName}}
+                    .table-responsive
+                        table.table.table-bordered.table-condensed.table-hover
+                            thead
+                                tr
+                                    th.col-sm-1 序号
+                                    th.col-sm-1 指标名称 
+                                    th.col-sm-1 加分内容
+                                    th.col-sm-2 数量
+                                    th.col-sm-1 加分情况说明
+                                    th.col-sm-1 减分内容
+                                    th.col-sm-2 数量
+                                    th.col-sm-1 减分情况说明
+                                    th.col-sm-1 得分
+                                    th.col-sm-1 操作
+                            tbody(ng-repeat='item in data_i.items')
+                                tr
+                                    td {{$index+1}}
+                                    td {{item.indexName}}
+                                    td {{item.increaseName}}({{item.increasePoint}}分/{{item.increaseUnit}})
+                                    td 
+                                        button.btn(ng-click="operate(item, 0, -1)") 
+                                            i.fa.fa-minus
+                                        input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="item.increaseNum")
+                                        button.btn(ng-click="operate(item, 0, 1)")
+                                            i.fa.fa-plus
+                                    td 
+                                        input(style="text-align: center;" type="text" placeholder="" ng-model="item.increaseDetail")
+                                    td {{item.decreaseName}}(-{{item.decreasePoint}}分/{{item.decreaseUnit}})
+                                    td 
+                                        button.btn(ng-click="operate(item, 1, -1)") 
+                                            i.fa.fa-minus
+                                        input(style="text-align: center;" type="text" size="2" placeholder="" ng-model="item.decreaseNum")
+                                        button.btn(ng-click="operate(item, 1, 1)")
+                                            i.fa.fa-plus
+                                    td 
+                                        input(style="text-align: center;" type="text" placeholder="" ng-model="item.decreaseDetail")
+                                    td {{item.totalPoint}}
+                                    td
+                                        button.btn.btn-link(type='button', ng-click='reset(item)')
+                                            span 清空
                         //- tfoot
                         //-     tr(ng-if='results.length===0')
                         //-         td(colspan='11') 暂无数据

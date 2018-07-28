@@ -36,7 +36,7 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                 url: '/evaluate',
                 title: '填写个人考评',
                 templateUrl: helper.basepath('evaluate.html'),
-                resolve: helper.resolveFor('ngDialog', 'moment'),
+                resolve: helper.resolveFor('ngDialog', 'moment', 'jquery-nav-js'),
                 controller: 'EvaluateController'
             })
             .state('app.result', {

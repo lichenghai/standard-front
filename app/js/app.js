@@ -90,7 +90,7 @@ App.config(['$stateProvider', '$locationProvider', '$urlRouterProvider', 'RouteH
                 url: '/evaluate',
                 title: '填写个人考评',
                 templateUrl: helper.basepath('evaluate.html'),
-                resolve: helper.resolveFor('ngDialog', 'moment'),
+                resolve: helper.resolveFor('ngDialog', 'moment', 'jquery-nav-js'),
                 controller: 'EvaluateController'
             })
             .state('app.result', {
@@ -290,7 +290,8 @@ App
             'ueditor': ['vendor/ueditor/ueditor.config.js',
                 'vendor/ueditor/ueditor.all.min.js'],
             'qiniu-js-sdk': ['vendor/qiniu-js-sdk/qiniu.js',
-                'vendor/qiniu-js-sdk/plupload/plupload.full.min.js']
+                'vendor/qiniu-js-sdk/plupload/plupload.full.min.js'],
+            'jquery-nav-js':['vendor/jquery.nav.js/jquery.nav.js']
         },
         // Angular based script (use the right module name)
         modules: [
@@ -476,6 +477,8 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                                 .then(function (response) {
                                     if (response.data.status === 200) {
                                         item['items'] = response.data.data;
+                                        //开启导航
+                                        $('#nav').onePageNav();
                                     } else {
                                         $.notify(response.data.message, 'danger');
                                     }
@@ -738,6 +741,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         });
         $(window).resize();
         loadRelations();
+
     }])
 ;
 
