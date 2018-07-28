@@ -477,8 +477,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                                 .then(function (response) {
                                     if (response.data.status === 200) {
                                         item['items'] = response.data.data;
-                                        //开启导航
-                                        $('#nav').onePageNav();
+                                         $('#nav').onePageNav();
                                     } else {
                                         $.notify(response.data.message, 'danger');
                                     }
@@ -627,7 +626,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                         } else {
                             // data1['fatherId'] = response.data.data.id;
                             //获取这波提交的内容，update小条目的fatherId
-                            $http.get($rootScope.url + '/standard-service/result/list?submitTime' + submitTime)
+                            $http.get($rootScope.url + '/standard-service/result/list?submitTime=' + submitTime)
                             .then(function (response) {
                                 if (response.data.status === 200) {
                                     var fatherId = 0;
@@ -729,6 +728,8 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             formatDayTitle: 'yyyy年M月',
         };
 
+        $scope.todayDate = moment().format('YYYY-MM-DD');
+
         $scope.open = function ($event, attr) {
             $event.preventDefault();
             $event.stopPropagation();
@@ -741,7 +742,6 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
         });
         $(window).resize();
         loadRelations();
-
     }])
 ;
 

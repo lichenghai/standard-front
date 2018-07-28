@@ -98,7 +98,7 @@ style.
                     .form-group.text-right
                 label.form-inline 日期：
                     .input-group
-                        input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true', ng-change='checkSubmition()')
+                        input.form-control(type='text', placeholder='选择日期', ng-model='datePicked', datepicker-popup='{{format}}', is-open='opened.start', datepicker-options='dateOptions', my-date, ng-required='true', current-text='今天', clear-text='清除', close-text='关闭', ng-disabled='true', ng-change='checkSubmition()', max-date="todayDate")
                         span.input-group-btn
                             button.btn.btn-default(type='button', ng-click='open($event, "start")')
                                 em.fa.fa-calendar
