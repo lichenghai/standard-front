@@ -2,6 +2,10 @@ h3 成长曲线
 
 #container(style="margin:0 auto")
     .row
+        .form-inline.col-lg-12 
+            h4.form-inline 姓名：
+                span {{$root.account.username}}    
+    .row
         .form-inline.col-lg-12
             label.form-inline 选择部门：
                 select.form-control(ng-options='item.departmentId as item.departmentName for item in relations', ng-model='search.departmentId',ng-change='loadData()')

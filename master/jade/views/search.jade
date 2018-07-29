@@ -2,8 +2,10 @@ h3 绩效查看
 
 #container.row(style='overflow-y: scroll')
     .col-lg-12
-        h4.row
-            span.col-lg-2 姓名:{{$root.account.username}}
+        .row
+            .form-inline.col-lg-12 
+                h4.form-inline 姓名：
+                    span {{$root.account.username}}
         hr
         .row
             .form-inline.col-lg-12

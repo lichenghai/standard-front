@@ -6,7 +6,6 @@ App.controller('ResultController', ['$scope', '$http', '$rootScope', '$state', '
     function ($scope, $http, $rootScope, $state, $stateParams) {
         $scope.standardDate = moment($stateParams.standardDate).format('YYYY年MM月DD日');
         var loadResults = function () {
-
             $http({
                 method: 'GET',
                 url: $rootScope.url + '/standard-service/result/list',
