@@ -86,7 +86,7 @@ style.
 
 #container.row(style='overflow-y: scroll')
     .col-lg-12
-        .row
+        .row#start
             .form-inline.col-lg-12 
                 h4.form-inline 姓名：
                     span {{$root.account.username}}
@@ -105,8 +105,12 @@ style.
                 label(ng-show="submitted", style='color:red') 今日已提交！
         hr
         ul#nav
+            li.current
+                a(href="#/app/evaluate#start") 顶端
             li(ng-repeat='data_i in data') 
                 a(href="#/app/evaluate#section{{data_i.id}}") {{data_i.indexName}}
+            li
+                a(href="#/app/evaluate#end") 提交
         .col-lg-12(style='background-color:white').tableContainer        
             .form-group(ng-repeat='data_i in data')
                 // START table-responsive
@@ -158,7 +162,7 @@ style.
                 // END table-responsive
             p 今日得分：{{totalPoints}}
             hr
-            .row
+            .row#end
                 .col-lg-12.text-center
                     button.btn.btn-success(type='button', ng-click='submit()', ng-disabled='submitted') 提交
                     button.btn.btn-default(type='button', ng-click='resetAll()', ng-disabled='submitted') 重置
