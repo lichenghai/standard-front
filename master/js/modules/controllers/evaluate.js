@@ -17,7 +17,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                 }, function (x) {
                     $.notify('服务器出了点问题，我们正在处理', 'danger');
                 });
-        }
+        };
         var loadIndex = function () {
             $scope.checkSubmition();
             $http.get($rootScope.url + '/standard-service/detail/list?departmentId=' + $scope.department.departmentId + '&level=0')
@@ -28,7 +28,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                             $http.get($rootScope.url + '/standard-service/detail/list?fatherId=' + item.id + '&level=1')
                                 .then(function (response) {
                                     if (response.data.status === 200) {
-                                        item['items'] = response.data.data;
+                                        item.items = response.data.data;
                                          $('#nav').onePageNav();
                                     } else {
                                         $.notify(response.data.message, 'danger');
@@ -36,39 +36,46 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                                 }, function (x) {
                                     $.notify('服务器出了点问题，我们正在处理', 'danger');
                                 });
-                        })
+                        });
                     } else {
                         $.notify(response.data.message, 'danger');
                     }
                 }, function (x) {
                     $.notify('服务器出了点问题，我们正在处理', 'danger');
                 });
-        }
+        };
 
         $scope.changeDepartment = loadIndex;
         $scope.submitted = false;
         $scope.totalPoints = 0;
 
+        //item:条目；index:0为加分内容，1为减分内容；step增减步长
         $scope.operate = function (item, index, step) {
-            if (index === 0) {
-                var val = item.increaseNum;
-                item.increaseNum = doPlus(val, step);
-            }
-            else if (index === 1) {
-                var val = item.decreaseNum;
-                item.decreaseNum = doPlus(val, step);
-            }
             if (isNaN(item.increaseNum) || item.increaseNum === "") {
                 item.increaseNum = 0;
             }
             if (isNaN(item.decreaseNum) || item.decreaseNum === "") {
                 item.decreaseNum = 0;
             }
+            if (index === 0) {
+                item.increaseNum = doPlus(item.increaseNum, step);
+            }
+            else if (index === 1) {
+                item.decreaseNum = doPlus(item.decreaseNum, step);
+            }
+
+            //先从总分减去当前的，再加上新的
             if (!isNaN(item.totalPoint)) {
                 $scope.totalPoints -= item.totalPoint;
             }
-            item.totalPoint = item.increaseNum * item.increasePoint - item.decreaseNum * item.decreasePoint;
+
+            item.totalPoint = Number((item.increaseNum * item.increasePoint - item.decreaseNum * item.decreasePoint).toFixed(1));
             $scope.totalPoints += item.totalPoint;
+
+            //解决Js浮点数运算Bug，小数点后出现一串尾数。
+            if ((item.increaseNum == 0) && (item.decreaseNum == 0)){
+                item.totalPoint = "";
+            }
         };
 
         var doPlus = function (val, step) {
@@ -82,6 +89,29 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                 val = 0;
             }
             return val;
+        };
+
+        $scope.inputNumChanged = function(item){
+
+            if (isNaN(item.increaseNum) || item.increaseNum === "") {
+                item.increaseNum = 0;
+            }
+            if (isNaN(item.decreaseNum) || item.decreaseNum === "") {
+                item.decreaseNum = 0;
+            }
+           //先从总分减去当前的，再加上新的
+            if (!isNaN(item.totalPoint)) {
+                $scope.totalPoints -= item.totalPoint;
+            }
+
+
+            item.totalPoint = Number((item.increaseNum * item.increasePoint - item.decreaseNum * item.decreasePoint).toFixed(1));
+            $scope.totalPoints += item.totalPoint;
+
+            //解决Js浮点数运算Bug，小数点后出现一串尾数。
+            if ((item.increaseNum == 0) && (item.decreaseNum == 0)){
+                item.totalPoint = "";
+            }
         };
 
         var
@@ -120,41 +150,41 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                 });
                 if (hasValue){
                     var data0 = {};
-                    data0['personId'] = $rootScope.account.id;
-                    data0['departmentId'] = $scope.department.departmentId;
-                    data0['departmentName'] = $scope.department.departmentName;
-                    data0['indexName'] = data_i.indexName;
-                    data0['level'] = 0;
-                    data0['fatherId'] = 0;
-                    data0['standardDate'] = standardDate;
-                    data0['submitTime'] = submitTime;
+                    data0.personId = $rootScope.account.id;
+                    data0.departmentId = $scope.department.departmentId;
+                    data0.departmentName = $scope.department.departmentName;
+                    data0.indexName = data_i.indexName;
+                    data0.level = 0;
+                    data0.fatherId = 0;
+                    data0.standardDate = standardDate;
+                    data0.submitTime = submitTime;
                     postData.push(data0);
 
                     data_i.items.forEach(function (item, index1, array1) {
                         if (!isNaN(item.totalPoint) && item.totalPoint !== "") {
                             var data1 = {};
-                            data1['indexName'] = item.indexName;
-                            data1['departmentId'] = $scope.department.departmentId;
-                            data1['departmentName'] = $scope.department.departmentName;
-                            data1['personId'] = $rootScope.account.id;
+                            data1.indexName = item.indexName;
+                            data1.departmentId = $scope.department.departmentId;
+                            data1.departmentName = $scope.department.departmentName;
+                            data1.personId = $rootScope.account.id;
 
-                            data1['increaseName'] = item.increaseName;
-                            data1['increasePoint'] = item.increasePoint;
-                            data1['increaseUnit'] = item.increaseUnit;
-                            data1['increaseNum'] = item.increaseNum;
-                            data1['increaseDetail'] = item.increaseDetail;
+                            data1.increaseName = item.increaseName;
+                            data1.increasePoint = item.increasePoint;
+                            data1.increaseUnit = item.increaseUnit;
+                            data1.increaseNum = item.increaseNum;
+                            data1.increaseDetail = item.increaseDetail;
 
-                            data1['decreaseName'] = item.decreaseName;
-                            data1['decreasePoint'] = item.decreasePoint;
-                            data1['decreaseUnit'] = item.decreaseUnit;
-                            data1['decreaseNum'] = item.decreaseNum;
-                            data1['decreaseDetail'] = item.decreaseDetail;
+                            data1.decreaseName = item.decreaseName;
+                            data1.decreasePoint = item.decreasePoint;
+                            data1.decreaseUnit = item.decreaseUnit;
+                            data1.decreaseNum = item.decreaseNum;
+                            data1.decreaseDetail = item.decreaseDetail;
 
-                            data1['totalPoint'] = item.totalPoint;
-                            data1['level'] = 1;
+                            data1.totalPoint = item.totalPoint;
+                            data1.level = 1;
 
-                            data1['standardDate'] = standardDate;
-                            data1['submitTime'] = submitTime;
+                            data1.standardDate = standardDate;
+                            data1.submitTime = submitTime;
 
                             postData.push(data1);
                         }
@@ -221,14 +251,14 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
                         $.notify('服务器出了点问题，我们正在处理', 'danger');
                     });
             }
-        }
+        };
 
         $scope.checkSubmition = function(){
             //查询当前日期是否已有记录
             var standardDate = moment($scope.datePicked).format('YYYY-MM-DD');
-            $http.get($rootScope.url + '/standard-service/result/list?standardDate=' + standardDate 
-                + '&personId=' + $rootScope.account.id 
-                + '&departmentId=' + $scope.department.departmentId)
+            $http.get($rootScope.url + '/standard-service/result/list?standardDate=' + standardDate + 
+                '&personId=' + $rootScope.account.id + 
+                '&departmentId=' + $scope.department.departmentId)
             .then(function (response) {
                 if (response.data.status === 200) {
                     if (response.data.data.length > 0){
@@ -244,7 +274,7 @@ App.controller('EvaluateController', ['$scope', '$http', '$rootScope', '$state',
             }, function (x) {
                 $.notify('服务器出了点问题，我们正在处理', 'danger');
             });
-        }
+        };
 
         $scope.reset = function (item) {
             $scope.totalPoints -= item.totalPoint;
